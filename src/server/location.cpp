@@ -2,21 +2,23 @@
 
 #include "location.hpp"
 
-location::location( void ) {
-	std::cout << "location is born" << std::endl;
+location::location(void)
+{
 }
 
-location::~location( void ) {
-	std::cout << "location is gone" << std::endl;
+location::~location(void)
+{
 }
 
-location::location( location const &to_copy ) {}
+location::location(location const &to_copy) {}
 
-location	&location::operator=( location const & rhs ) {
+location &location::operator=(location const &rhs)
+{
 	return *this;
 }
 
-void 	location::set(std::string key, std::string value) {
+void location::set(std::string key, std::string value)
+{
 	if (key == "root")
 		_root = value;
 	else if (key == "index")
@@ -29,12 +31,14 @@ void 	location::set(std::string key, std::string value) {
 		_directory_listing = value;
 }
 
-void 	location::set(std::string key, size_t value) {
+void location::set(std::string key, size_t value)
+{
 	if (key == "max_body_size")
 		_max_body_size = value;
 }
 
-void 	location::set(std::string key, bool value) {
+void location::set(std::string key, bool value)
+{
 	if (key == "autoindex")
 		_autoindex = value;
 }
