@@ -7,7 +7,7 @@ CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
 RM = rm -rf
 
-SOURCES = 	./src/main.cpp \
+SOURCES = 	./src/webserv.cpp \
 
 
 OBJECTS = $(SOURCES:%.cpp=%.o)
