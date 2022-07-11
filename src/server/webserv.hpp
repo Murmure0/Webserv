@@ -6,6 +6,7 @@
 # include <string>
 # include <iostream>
 # include <map>
+# include "../../includes/webserv.hpp"
 # include "server.hpp"
 
 class webserv {
