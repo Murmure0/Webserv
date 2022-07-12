@@ -3,8 +3,7 @@
 #ifndef WEBSERV_H
 # define WEBSERV_H
 
-# include <string>
-# include <iostream>
+# include "../../includes/h_webserv.hpp"
 # include <map>
 # include "server.hpp"
 
