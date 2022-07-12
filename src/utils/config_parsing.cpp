@@ -64,6 +64,7 @@ t_config get_next_variable(std::string str)
 	{
 		size_t bracket_level = 1;
 		config.key = trim(line.substr(0, line.find_first_of(' ')));
+		config.before_braquet = trim(line.substr(line.find_first_of(' '), line.find_first_of('{') - line.find_first_of(' ')));
 		while (bracket_level != 0 && std::getline(f, line))
 		{
 			config.next_start += line.length() + 1;

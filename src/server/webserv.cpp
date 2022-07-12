@@ -51,16 +51,20 @@ void webserv::config(std::string config_file)
 
 				if (s_c.key == "location")
 				{
+					std::pair<std::string, location> l_pair;
+					l_pair.first = s_c.before_braquet;
+					l_pair.second.set("location_match", s_c.before_braquet);
 					while (!l_c.key.empty() || l_i)
 					{
 						l_i = false;
 						l_c = get_next_variable(s_c.value);
-
+						l_pair.second.set(l_c.key, l_c.value);
 						if (s_c.value.length() > l_c.next_start)
 							s_c.value = s_c.value.substr(l_c.next_start);
 						else
 							break;
 					}
+					pair.second.add_location(l_pair);
 				}
 				else
 				{
@@ -71,6 +75,7 @@ void webserv::config(std::string config_file)
 				else
 					break;
 			}
+			pair.first = pair.second.get_id() + "_" + std::to_string(servers.size());
 			servers.insert(pair);
 		}
 		if (s.length() > m_c.next_start)
