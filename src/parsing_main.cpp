@@ -1,18 +1,18 @@
-
 #include "server/webserv.hpp"
-#include "../includes/h_webserv.hpp"
 
-
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
 
 	if (argc != 2)
 	{
-		return;
+		return 0;
 	}
-	
 
 	webserv ws;
 
 	ws.config(argv[1]);
 
+	ws.print();
+
+	return 0;
 }
