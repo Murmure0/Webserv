@@ -14,5 +14,6 @@ int main(int argc, char **argv)
 
 	ws.print();
 
+	// ws.run();
 	return 0;
 }

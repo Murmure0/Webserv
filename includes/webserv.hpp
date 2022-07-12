@@ -18,6 +18,6 @@ typedef struct config_parsing
 	size_t		next_start;
 }				t_config;
 
-std::string file_to_string(std::string file_path);
+std::string		file_to_string(std::string file_path);
 config_parsing	get_next_variable(std::string str);
-void		print_line(t_config line);
+void			print_line(t_config line);

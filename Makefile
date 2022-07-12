@@ -7,7 +7,16 @@ CXXFLAGS =
 
 RM = rm -rf
 
-SOURCES = 	./src/webserv.cpp \
+SOURCES = 	./src/parsing_main.cpp \
+
+			./src/server/location.cpp \
+			./src/server/server.cpp \
+			./src/server/webserv.cpp \
+
+			./src/utils/setup_server.cpp \
+			./src/utils/running_server/setup_server.cpp \
+
+
 
 
 OBJECTS = $(SOURCES:%.cpp=%.o)
