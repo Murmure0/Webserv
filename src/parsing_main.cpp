@@ -14,6 +14,10 @@ int main(int argc, char **argv)
 
 	ws.print();
 
-	// ws.run();
+	// try{	ws.run();	}
+	// catch(std::exception &e)
+	// {
+	// 	std::cerr << e.what() << std::endl;
+	// }
 	return 0;
 }

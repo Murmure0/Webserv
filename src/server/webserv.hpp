@@ -21,7 +21,16 @@ public:
 
 	void config(std::string config_file);
 	void run(void);
-	void close(void);
+	void close_fd(void);
+
+	class ServerInitFailed : public std::exception{
+		public:
+			virtual const char* what() const throw()
+			{
+				return("Server initialisation failed.");
+			}
+	};
+
 
 private:
 	std::map<std::string, server> servers;

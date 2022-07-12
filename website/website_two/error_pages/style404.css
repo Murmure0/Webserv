@@ -1,0 +1,21 @@
+.bouya{
+	background-color: rgb(226, 206, 225);
+	width: 30%;
+	margin-left: 3%;
+}
+.pouc{
+	max-width: 100%;
+	/* margin-left: 30%; */
+}
+.flex{
+	display: flex;
+	justify-content: center;
+	width: 50%;
+}
+.img{
+	max-width: 100%;
+}
+a{
+	color: rgb(250, 139, 65);
+	text-decoration: none;
+}

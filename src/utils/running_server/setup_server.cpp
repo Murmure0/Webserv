@@ -1,52 +1,55 @@
 #include "../../../includes/webserv.hpp"
 
-int setup_server(int port, int backlog)
+int setup_server(int port, int backlog, sockaddr_in sockaddr)
 {
 	// exemple :
-	// int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	// if (sockfd == -1) {
-	// 	std::cout << "Failed to create socket. errno: " << errno << std::endl;
-	// 	exit(EXIT_FAILURE);
-	// }
+	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockfd == -1) {
+		std::cout << "Failed to create socket." << std::endl;
+		return -1;
+	}
 
-	// // Listen to port 4040 on any address
-	// sockaddr_in sockaddr;
-	// sockaddr.sin_family = AF_INET;
-	// sockaddr.sin_addr.s_addr = INADDR_ANY;
-	// sockaddr.sin_port = htons(3030); // htons is necessary to convert a number to
-	// 								// network byte order
-	// if (bind(sockfd, (struct sockaddr*)&sockaddr, sizeof(sockaddr)) < 0) {
-	// 	std::cout << "Failed to bind to port 9999. errno: " << errno << std::endl;
-	// 	exit(EXIT_FAILURE);
-	// }
+	if (bind(sockfd, (struct sockaddr*)&sockaddr, sizeof(sockaddr)) < 0) {
+		std::cout << "Failed to bind to port " << port << std::endl;
+		return -1;
+	}
 
-	// // Start listening. Hold at most 10 connections in the queue
-	// if (listen(sockfd, 10) < 0) {
-	// 	std::cout << "Failed to listen on socket. errno: " << errno << std::endl;
-	// 	exit(EXIT_FAILURE);
-	// }
+	// // Start listening. Hold at most backlog connections in the queue
+	if (listen(sockfd, backlog) < 0) {
+		std::cout << "Failed to listen on socket." << std::endl;
+		return -1;
+	}
+
+	return sockfd;
 
 	// // Grab a connection from the queue
-	// for ( ; ; )
-	// {
-	// 	auto addrlen = sizeof(sockaddr);
-	// 	int connection = accept(sockfd, (struct sockaddr*)&sockaddr, (socklen_t*)&addrlen);
-	// 	if (connection < 0) {
-	// 		std::cout << "Failed to grab connection. errno: " << errno << std::endl;
-	// 		exit(EXIT_FAILURE);
-	// 	}
 
-	// 	// Read from the connection
-	// 	char buffer[100];
-	// 	auto bytesRead = read(connection, buffer, 100);
-	// 	std::cout << "The message was: " << buffer;
+		
+	return 0;
+}
 
-	// 	// Send a message to the connection
-	// 	std::string response = "Good talking to you\n";
-	// 	send(connection, response.c_str(), response.size(), 0);
+int accept_new_connection(int server_fd, sockaddr_in sockaddr)
+{
+	auto addrlen = sizeof(sockaddr);
+	int connection = accept(server_fd, (struct sockaddr*)&sockaddr, (socklen_t*)&addrlen);
+	if (connection < 0) {
+		std::cout << "Failed to grab connection." << std::endl;
+		return -1;
+	}
+	return connection;
+}
 
-	// 	// Close the connections
-	// 	close(connection);
-	// }
-	// close(sockfd);
+void handle_connection(int client_socket, int server_fd, int connection)
+{
+	// Read from the connection
+	char buffer[100];
+	auto bytesRead = read(connection, buffer, 100);
+	std::cout << "The message was: " << buffer;
+
+	// Send a message to the connection
+	std::string response = "Good talking to you\n";
+	send(connection, response.c_str(), response.size(), 0);
+
+	// Close the connection
+	close(connection);
 }
