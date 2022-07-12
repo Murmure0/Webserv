@@ -84,3 +84,18 @@ void webserv::config(std::string config_file)
 			break;
 	}
 }
+
+
+void run(void)
+{
+	std::cout << "In run : not doing anything for now" << std::endl;
+
+	int port = 8080;
+	int backlog = 10 ; //maximum length to which the queue of pending connections for sockfd may grow.
+
+	// initialiser une struct sockaddr / port
+
+	// setup_server(port, backlog);
+
+	// gerer connections clients
+}
