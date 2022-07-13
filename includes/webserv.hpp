@@ -10,6 +10,7 @@
 
 #include <sys/select.h>
 #include <netinet/in.h>
+#include <fcntl.h>
 
 typedef struct config_parsing
 {

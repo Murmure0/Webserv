@@ -86,18 +86,22 @@ void webserv::config(std::string config_file)
 }
 
 
+
 void webserv::run(void)
 {
 	std::cout << "In run : not doing anything for now. -o- zzz" << std::endl;
 
-	this->servers.find("id_server"); // ?
-	
+	// server &server_one = this->servers.find("id_server")->second; //trouver les ports
+	// std::string const &port_one = server_one.get_id();
+	// int port_int = atoi(port_one.c_str());
+
 	int port = 8080;
 	int backlog = 10 ; //maximum length to which the queue of pending connections for sockfd may grow.
 	
 	// initialiser une struct sockaddr / port
 	// // Listen to the port given on any address
 	sockaddr_in sockaddr;
+	bzero(&sockaddr, sizeof(sockaddr));
 	sockaddr.sin_family = AF_INET;
 	sockaddr.sin_addr.s_addr = INADDR_ANY;
 	sockaddr.sin_port = htons(port); // htons is necessary to convert a number to
@@ -112,9 +116,9 @@ void webserv::run(void)
 	while(true)
 	{
 		//wait for, and eventually accept an incoming connection
-		int client_socket = accept_new_connection(server_fd);
+		int client_socket = accept_new_connection(server_fd, sockaddr);
 		//do what you want with the connection :
-		handle_connection(client_socket); 
+		handle_connection(client_socket, server_fd);
 	}
 	close(server_fd);
 }

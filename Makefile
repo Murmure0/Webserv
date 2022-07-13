@@ -8,12 +8,10 @@ CXXFLAGS =
 RM = rm -rf
 
 SOURCES = 	./src/parsing_main.cpp \
-
 			./src/server/location.cpp \
 			./src/server/server.cpp \
 			./src/server/webserv.cpp \
-
-			./src/utils/setup_server.cpp \
+			./src/utils/config_parsing.cpp \
 			./src/utils/running_server/setup_server.cpp \
 
 
