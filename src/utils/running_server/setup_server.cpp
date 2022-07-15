@@ -19,8 +19,8 @@ int webserv::setup_server(int port, int backlog, sockaddr_in sockaddr)
 		return -1;
 	}
 
+	//WORKING ON SELECT BEFORE TRYING / infinite-loop 
 	// /* Allow non-blocking connections, when we will have much more connections */
-	//WORKING ON SELECT BEFORE TRYING
 	// if (fcntl(sockfd, F_SETFL, O_NONBLOCK) < 0){
 	// 	std::cout << "Failed to set the socket as unblocking." << std::endl;
 	// 	return -1;
@@ -43,7 +43,7 @@ int webserv::setup_server(int port, int backlog, sockaddr_in sockaddr)
 
 
 /*
-	Reminder :
+	my basics Reminders :
 
 	someClass n = 2;
 	get a pointer on n -> someClass *ptr = &n;

@@ -91,27 +91,36 @@ void webserv::run(void)
 {
 	std::cout << "Server running : listening on port 8080 (test)" << std::endl;
 
-	// server &server_one = this->servers.find("id_server")->second; //trouver les ports
+	// Trouver les ports dans les serveurs :
+	// server &server_one = this->servers.find("id_server")->second; 
 	// std::string const &port_one = server_one.get_id();
 	// int port_int = atoi(port_one.c_str());
 
+	// Pour l'instant on écoute sur le port 8080 de maniere arbitraire :
 	int port = 8080;
 	int backlog = 10 ; //maximum length to which the queue of pending connections for sockfd may grow.
 	
-	// initialiser une struct sockaddr / port
-	// // Listen to the port given on any address
+	// Une struct sockaddr permet d'indiquer :
+	// - AF_NET : on va utiliser des IPv4
+	// - INADDR_ANY : on va travailler avec tous les IP dispo
+	// - htons(port) : "host to network, short" traduit notre num de port en un nombre avec l'ordre de byte du network == compatibilité quelque soit les machine emetrice/receptrice avec lesquelles on bossera
+	
+	// on initialisera une struct sockaddr / port
 	sockaddr_in sockaddr;
 	bzero(&sockaddr, sizeof(sockaddr));
 	sockaddr.sin_family = AF_INET;
 	sockaddr.sin_addr.s_addr = INADDR_ANY;
 	sockaddr.sin_port = htons(port); // htons is necessary to convert a number to
 									// network byte order
+
+	//on initialise le(s) serveurs avec les données trouvées dans le fichier de config
 	int server_fd= setup_server(port, backlog, sockaddr); //pour un seul serveur pour l'instant
 	if(server_fd < 0) 
 	{
 		throw (ServerInitFailed());
 	}
 
+	//on gere les connections clients 
 	handle_client_connection(server_fd, sockaddr);
 	
 	close(server_fd);
