@@ -11,6 +11,7 @@
 #include <sys/select.h>
 #include <netinet/in.h>
 #include <fcntl.h>
+#include <linux/limits.h>
 
 typedef struct config_parsing
 {

@@ -55,20 +55,47 @@ int webserv::accept_new_connection(int server_fd, sockaddr_in sockaddr)
 void webserv::handle_connection(int client_socket, int server_fd)
 {
 	// Read from the connection : Parsing client response !
-	char buffer[100];
-	size_t bytesRead = read(client_socket, buffer, 100);
-	std::cout << "The message was: " << buffer;
 
+	char buffer[4096];
+	size_t bytes_read;
+	int msg_size = 0;
+	
+	 while((bytes_read = read(client_socket, buffer + msg_size, sizeof(buffer)-msg_size-1)))
+	 {
+		msg_size += bytes_read;
+		if (msg_size > 4095 || buffer[msg_size-1] == '\n')
+			break;
+	 }
+	 buffer[msg_size-1] = 0;
+	std::cout << "The request message was: " << buffer;
 
+	fflush(stdout);
 
-	// Send a message to the connection
-	std::string response = "HTTP/1.1 200 OK\r\n\r\nGot The Message! :o\r\n";
+	std::ifstream infile("./website/ressources/index.html");
+	if(!infile.good())
+	{
+		std::cout <<"Wrong filename."<< std::endl;
+		return ;
+	}
+	else if (infile.peek() == EOF)
+	{
+		std::cout << "Empty file." << std::endl;
+		return ;
+	}
+	std::stringstream ss;
+	std::string str_resp;
 
-	send(client_socket, response.c_str(), response.size(), 0);
+	ss << infile.rdbuf();
+	str_resp = "HTTP/1.1 200 OK\r\n\r\n" + ss.str() + "\r\n";
 
-	// Close the connection
+	int len = str_resp.size();
+
+	send(client_socket, (char*)str_resp.c_str(), len, 0);
+
+	infile.close();
+
 	close(client_socket);
-
+	return ;
 }
 
 

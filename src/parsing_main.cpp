@@ -5,6 +5,7 @@ int main(int argc, char **argv)
 
 	if (argc != 2)
 	{
+		std::cout << "Don't forget the config file" << std::endl;
 		return 0;
 	}
 
@@ -16,11 +17,11 @@ int main(int argc, char **argv)
 
 
 	
-	// try{	ws.run();	}
-	// catch(std::exception &e)
-	// {
-	// 	std::cerr << e.what() << std::endl;
-	// 	exit(1);
-	// }
+	try{	ws.run();	}
+	catch(std::exception &e)
+	{
+		std::cerr << e.what() << std::endl;
+		exit(1);
+	}
 	return 0;
 }

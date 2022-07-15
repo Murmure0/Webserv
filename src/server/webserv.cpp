@@ -89,7 +89,7 @@ void webserv::config(std::string config_file)
 
 void webserv::run(void)
 {
-	std::cout << "In run : not doing anything for now. -o- zzz" << std::endl;
+	std::cout << "Server running : listening on port 8080 (test)" << std::endl;
 
 	// server &server_one = this->servers.find("id_server")->second; //trouver les ports
 	// std::string const &port_one = server_one.get_id();
