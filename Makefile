@@ -13,8 +13,7 @@ SOURCES = 	./src/parsing_main.cpp \
 			./src/server/webserv.cpp \
 			./src/utils/config_parsing.cpp \
 			./src/utils/running_server/setup_server.cpp \
-
-
+			./src/utils/running_server/handle_client_connection.cpp \
 
 
 OBJECTS = $(SOURCES:%.cpp=%.o)

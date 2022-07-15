@@ -112,13 +112,7 @@ void webserv::run(void)
 		throw (ServerInitFailed());
 	}
 
-	// gerer connections clients:
-	while(true)
-	{
-		//wait for, and eventually accept an incoming connection
-		int client_socket = accept_new_connection(server_fd, sockaddr);
-		//do what you want with the connection :
-		handle_connection(client_socket, server_fd);
-	}
+	handle_client_connection(server_fd, sockaddr);
+	
 	close(server_fd);
 }
