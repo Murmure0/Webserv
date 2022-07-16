@@ -11,7 +11,12 @@
 #include <sys/select.h>
 #include <netinet/in.h>
 #include <fcntl.h>
+
+#ifdef __linux
 #include <linux/limits.h>
+#elif __APPLE__
+#include <limits.h>
+#endif
 
 typedef struct config_parsing
 {
@@ -27,4 +32,4 @@ void print_line(t_config line);
 
 int setup_server(int port, int backlog, sockaddr_in sockaddr);
 int accept_new_connection(int server_fd);
-void handle_connection(int client_socket); 
+void handle_connection(int client_socket);
