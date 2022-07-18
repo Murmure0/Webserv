@@ -11,6 +11,7 @@ SOURCES = 	./src/parsing_main.cpp \
 			./src/server/location.cpp \
 			./src/server/server.cpp \
 			./src/server/webserv.cpp \
+			./src/sockets/listen_socket.cpp \
 			./src/utils/config_parsing.cpp \
 			./src/utils/running_server/setup_server.cpp \
 			./src/utils/running_server/handle_client_connection.cpp \

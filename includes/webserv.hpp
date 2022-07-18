@@ -7,10 +7,12 @@
 #include <cstring>
 #include <fstream>
 #include <sstream>
-
+#include <map>
+#include <vector>
 #include <sys/select.h>
 #include <netinet/in.h>
 #include <fcntl.h>
+#include <algorithm>
 
 #ifdef __linux
 #include <linux/limits.h>

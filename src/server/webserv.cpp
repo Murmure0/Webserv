@@ -22,6 +22,7 @@ void webserv::print(void) const
 {
 	for (std::map<std::string, server>::const_iterator i = servers.begin(); i != servers.end(); i++)
 	{
+		std::cout << (*i).first << std::endl;
 		(*i).second.print();
 	}
 }
@@ -29,6 +30,7 @@ void webserv::print(void) const
 void webserv::config(std::string config_file)
 {
 	std::string s = file_to_string(config_file);
+	std::map<int, int> port_count;
 	t_config m_c;
 	t_config s_c;
 	t_config l_c;
@@ -75,7 +77,23 @@ void webserv::config(std::string config_file)
 				else
 					break;
 			}
-			pair.first = pair.second.get_id() + "_" + std::to_string(servers.size());
+			if (port_count.find(stoi(pair.second.get_id())) == port_count.end())
+			{
+				std::pair<int, int> port_pair(stoi(pair.second.get_id()), 0);
+				listen_socket sock(stoi(pair.second.get_id()));
+				std::cout << "heheheheheh: " << stoi(pair.second.get_id()) << std::endl;
+				_listen_sockets.push_back(sock);
+				port_pair.first = stoi(pair.second.get_id());
+				port_pair.second = 0;
+				port_count.insert(port_pair);
+				pair.first = pair.second.get_id() + "_0";
+			}
+			else
+			{
+				std::cout << "he patte" << std::endl;
+				(*port_count.find(stoi(pair.second.get_id()))).second += 1;
+				pair.first = pair.second.get_id() + "_" + std::to_string((*port_count.find(stoi(pair.second.get_id()))).second);
+			}
 			servers.insert(pair);
 		}
 		if (s.length() > m_c.next_start)
@@ -85,43 +103,48 @@ void webserv::config(std::string config_file)
 	}
 }
 
-
-
 void webserv::run(void)
 {
 	std::cout << "Server running : listening on port 8080 (test)" << std::endl;
 
 	// Trouver les ports dans les serveurs :
-	// server &server_one = this->servers.find("id_server")->second; 
+	// server &server_one = this->servers.find("id_server")->second;
 	// std::string const &port_one = server_one.get_id();
 	// int port_int = atoi(port_one.c_str());
 
 	// Pour l'instant on écoute sur le port 8080 de maniere arbitraire :
 	int port = 8080;
-	int backlog = 10 ; //maximum length to which the queue of pending connections for sockfd may grow.
-	
+	int backlog = 10; // maximum length to which the queue of pending connections for sockfd may grow.
+
 	// Une struct sockaddr permet d'indiquer :
 	// - AF_NET : on va utiliser des IPv4
 	// - INADDR_ANY : on va travailler avec tous les IP dispo
 	// - htons(port) : "host to network, short" traduit notre num de port en un nombre avec l'ordre de byte du network == compatibilité quelque soit les machine emetrice/receptrice avec lesquelles on bossera
-	
+
 	// on initialisera une struct sockaddr / port
 	sockaddr_in sockaddr;
 	bzero(&sockaddr, sizeof(sockaddr));
 	sockaddr.sin_family = AF_INET;
 	sockaddr.sin_addr.s_addr = INADDR_ANY;
 	sockaddr.sin_port = htons(port); // htons is necessary to convert a number to
-									// network byte order
+									 // network byte order
 
-	//on initialise le(s) serveurs avec les données trouvées dans le fichier de config
-	int server_fd= setup_server(port, backlog, sockaddr); //pour un seul serveur pour l'instant
-	if(server_fd < 0) 
+	// on initialise le(s) serveurs avec les données trouvées dans le fichier de config
+	int server_fd = setup_server(port, backlog, sockaddr); // pour un seul serveur pour l'instant
+	if (server_fd < 0)
 	{
-		throw (ServerInitFailed());
+		throw(ServerInitFailed());
 	}
 
-	//on gere les connections clients 
+	// on gere les connections clients
 	handle_client_connection(server_fd, sockaddr);
-	
+
 	close(server_fd);
+}
+
+void webserv::run(int test)
+{
+	std::cout << "Server running : listening on port 8080 (test bis)" << std::endl;
+
+	handle_client_connection();
 }
