@@ -21,7 +21,6 @@ public:
 
 	void config(std::string config_file);
 	void run(void);
-	void run(int test);
 	void close_fd(void);
 	void close_sockets(void);
 
