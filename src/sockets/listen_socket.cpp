@@ -31,10 +31,10 @@ listen_socket::listen_socket(int port) : _port(port)
 
 	// WORKING ON SELECT BEFORE TRYING / infinite-loop
 	//  /* Allow non-blocking connections, when we will have much more connections */
-	//  if (fcntl(sockfd, F_SETFL, O_NONBLOCK) < 0){
-	//  	std::cout << "Failed to set the socket as unblocking." << std::endl;
-	//  	return -1;
-	//  }
+	if (fcntl(_sockfd, F_SETFL, O_NONBLOCK) < 0)
+	{
+		std::cout << "Failed to set the socket as unblocking." << std::endl;
+	}
 
 	/* Connect the stream socket (socketfd) to the port listened by the server*/
 	if (bind(_sockfd, (struct sockaddr *)&_addr, sizeof(_addr)) < 0)

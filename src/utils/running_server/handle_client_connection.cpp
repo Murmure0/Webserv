@@ -4,9 +4,6 @@
 int webserv::accept_new_connection(int server_fd, sockaddr_in sockaddr)
 {
 	unsigned long addrlen = sizeof(sockaddr);
-	std::cout << "///////////////" << std::endl;
-	std::cout << "///////NEW////" << std::endl;
-	std::cout << "///////////////" << std::endl;
 	int connection = accept(server_fd, (struct sockaddr *)&sockaddr, (socklen_t *)&addrlen);
 	if (connection < 0)
 	{
@@ -18,21 +15,37 @@ int webserv::accept_new_connection(int server_fd, sockaddr_in sockaddr)
 
 void webserv::handle_connection(int client_socket)
 {
-	// Read from the connection : here will be Parsing client response !
+	// Read from the connection : here will be Parsing client response
+
+	request req;
 
 	char buffer[4096];
-	size_t bytes_read;
-	int msg_size = 0;
+	size_t bytes_read = 4096;
+	std::string buff;
 
-	while ((bytes_read = read(client_socket, buffer + msg_size, sizeof(buffer) - msg_size - 1)))
+	while (buff.find("\r\n\r\n") == std::string::npos && bytes_read >= 4095)
 	{
-		msg_size += bytes_read;
-		if (msg_size > 4095 || buffer[msg_size - 1] == '\n')
-			break;
+		bytes_read = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
+		buffer[bytes_read] = 0;
+		buff += std::string(buffer, bytes_read);
 	}
-	buffer[msg_size - 1] = 0;
-	std::cout << "The request message was: " << buffer;
-	// ici commence l'utilisation de notre classe server
+
+	// req.config(buff.substr(0, buff.find("\r\n\r\n")));
+	buff = buff.substr(buff.find("\r\n\r\n") + 4);
+
+	char body_buffer[65536];
+	bytes_read = bytes_read == 4095 ? 65536 : 0;
+	while (bytes_read >= 65535)
+	{
+		bytes_read = recv(client_socket, body_buffer, sizeof(body_buffer) - 1, 0);
+		buffer[bytes_read] = 0;
+		buff += std::string(buffer, bytes_read);
+	}
+
+	std::cout << buff.size() << std::endl;
+
+	// std::cout << "The request message was: " << buff.find("\r\n\r\n") << "  " << bytes_read;
+	//  ici commence l'utilisation de notre classe server
 	std::cout << std::endl;
 
 	fflush(stdout);
@@ -69,78 +82,17 @@ void webserv::handle_connection(int client_socket)
 	return;
 }
 
-int webserv::handle_client_connection(int server_fd, sockaddr_in sockaddr)
-{
-	// J'ai tout vu la dedans : https://www.youtube.com/watch?v=Y6pFtgRdUts&t=1s
-
-	// Initialize var & macro for using select() later
-	fd_set current_sockets;
-	fd_set ready_sockets;
-
-	FD_ZERO(&current_sockets);
-
-	// ADD server socket to the current set of fd
-	// Later : ADD all other server_fd
-	FD_SET(server_fd, &current_sockets);
-
-	// handling client connection :
-	while (true)
-	{
-		// select() is destructive, we're keeping the fd we're following in current_socket
-		// and selecting from ready_sockets;
-		ready_sockets = current_sockets;
-
-		if (select(FD_SETSIZE, &ready_sockets, NULL, NULL, 0) < 0)
-		{
-			std::cout << "HoNo, select failed D:" << std::endl;
-			exit(1);
-		}
-		std::cout << "Waiting for connections..." << std::endl;
-
-		// wait for, and eventually accept and handle an incoming connection
-		for (int i = 0; i < FD_SETSIZE; i++)
-		{
-			if (FD_ISSET(i, &ready_sockets))
-			{
-				if (i == server_fd)
-				{
-					int client_socket = accept_new_connection(server_fd, sockaddr);
-					FD_SET(client_socket, &current_sockets);
-				}
-				else
-				{
-					// do what you want with the connection :
-					handle_connection(i);
-					FD_CLR(i, &current_sockets);
-				}
-			}
-		}
-	}
-	// CTRL +C :
-	exit(EXIT_SUCCESS);
-}
-
-std::vector<listen_socket>::iterator find(std::vector<listen_socket>::iterator begin, std::vector<listen_socket>::iterator end, int to_find)
-{
-	while (begin < end)
-	{
-		if ((*begin).get_fd() == to_find)
-		{
-			return begin;
-		}
-		begin++;
-	}
-	return end;
-}
-
 int webserv::handle_client_connection(void)
 {
 	// J'ai tout vu la dedans : https://www.youtube.com/watch?v=Y6pFtgRdUts&t=1s
 
 	// Initialize var & macro for using select() later
 	fd_set current_sockets;
-	fd_set ready_sockets;
-	int index;
+	fd_set ready_read_sockets;
+	fd_set ready_write_sockets;
+
+	std::map<int, request> open_requests;
+	std::map<int, responce> open_responces;
 
 	FD_ZERO(&current_sockets);
 
@@ -156,32 +108,67 @@ int webserv::handle_client_connection(void)
 	{
 		// select() is destructive, we're keeping the fd we're following in current_socket
 		// and selecting from ready_sockets;
-		ready_sockets = current_sockets;
+		ready_read_sockets = current_sockets;
 
-		if (select(FD_SETSIZE, &ready_sockets, NULL, NULL, 0) < 0)
+		FD_ZERO(&ready_write_sockets);
+		for (std::map<int, responce>::iterator i = open_responces.begin(); i != open_responces.end(); i++)
+			FD_SET((*i).first, &ready_write_sockets);
+
+		if (select(FD_SETSIZE, &ready_read_sockets, &ready_write_sockets, NULL, 0) < 0)
 		{
 			std::cout << "HoNo, select failed D:" << std::endl;
 			exit(1);
 		}
-		std::cout << "Waiting for connections..." << std::endl;
 
 		// wait for, and eventually accept and handle an incoming connection
-		for (int i = 0; i < FD_SETSIZE; i++)
+
+		for (std::map<int, responce>::iterator i = open_responces.begin(); i != open_responces.end(); i++)
 		{
-			if (FD_ISSET(i, &ready_sockets))
+			if (FD_ISSET((*i).first, &ready_write_sockets))
 			{
-				std::vector<listen_socket>::iterator it = find(_listen_sockets.begin(), _listen_sockets.end(), i);
-				if (it != _listen_sockets.end())
+				std::ifstream infile("./website/ressources/index.html");
+				std::stringstream ss;
+				std::string str_resp;
+
+				ss << infile.rdbuf();
+
+				// adding the minimal http header-ever to the file content:
+				str_resp = "HTTP/1.1 200 OK\r\n\r\n" + ss.str() + "\r\n";
+
+				int len = str_resp.size();
+
+				// sending to client :
+				send((*i).first, (char *)str_resp.c_str(), len, 0);
+
+				infile.close();
+				open_responces.erase(i);
+				close((*i).first);
+				break;
+			}
+		}
+
+		for (std::map<int, request>::iterator i = open_requests.begin(); i != open_requests.end(); i++)
+		{
+			if (FD_ISSET((*i).first, &ready_read_sockets))
+			{
+				(*i).second.read_and_append((*i).first);
+				if ((*i).second.is_completed())
 				{
-					int client_socket = accept_new_connection((*it).get_fd(), (*it).get_addr());
-					FD_SET(client_socket, &current_sockets);
+					open_responces[(*i).first] = responce();
+					FD_CLR((*i).first, &current_sockets);
+					open_requests.erase(i);
+					break;
 				}
-				else
-				{
-					// do what you want with the connection :
-					handle_connection(i);
-					FD_CLR(i, &current_sockets);
-				}
+			}
+		}
+
+		for (std::vector<listen_socket>::iterator i = _listen_sockets.begin(); i != _listen_sockets.end(); i++)
+		{
+			if (FD_ISSET((*i).get_fd(), &ready_read_sockets))
+			{
+				int client_socket = accept_new_connection((*i).get_fd(), (*i).get_addr());
+				open_requests[client_socket] = request();
+				FD_SET(client_socket, &current_sockets);
 			}
 		}
 	}

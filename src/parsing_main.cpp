@@ -13,11 +13,11 @@ int main(int argc, char **argv)
 
 	ws.config(argv[1]);
 
-	ws.print();
+	// ws.print();
 
 	try
 	{
-		ws.run(1);
+		ws.run();
 	}
 	catch (std::exception &e)
 	{

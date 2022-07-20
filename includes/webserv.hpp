@@ -20,6 +20,11 @@
 #include <limits.h>
 #endif
 
+#define BUFFER_SIZE 65536
+
+#include "../src/http/request.hpp"
+#include "../src/http/responce.hpp"
+
 typedef struct config_parsing
 {
 	std::string key;
