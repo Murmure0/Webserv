@@ -21,21 +21,15 @@ public:
 
 	void config(std::string config_file);
 	void run(void);
+	void run(int test);
 	void close_fd(void);
+	void close_sockets(void);
 
 	static int setup_server(int port, int backlog, sockaddr_in sockaddr);
+	static int handle_client_connection(int server_fd, sockaddr_in sockaddr);
 	int handle_client_connection(void);
 	static int accept_new_connection(int server_fd, sockaddr_in sockaddr);
 	static void handle_connection(int client_socket);
-
-	class ServerInitFailed : public std::exception
-	{
-	public:
-		virtual const char *what() const throw()
-		{
-			return ("Server initialisation failed.");
-		}
-	};
 
 private:
 	std::map<std::string, server> servers;

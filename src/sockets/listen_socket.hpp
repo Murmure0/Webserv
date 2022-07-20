@@ -19,6 +19,15 @@ public:
 	int get_fd(void) const;
 	sockaddr_in get_addr(void) const;
 
+	class ServerInitFailed : public std::exception
+			{
+			public:
+				virtual const char *what() const throw()
+				{
+					return ("Server initialisation failed.");
+				}
+			};
+
 private:
 	int _port;
 	int _sockfd;

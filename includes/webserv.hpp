@@ -13,6 +13,7 @@
 #include <netinet/in.h>
 #include <fcntl.h>
 #include <algorithm>
+#include <csignal>
 
 #ifdef __linux
 #include <linux/limits.h>

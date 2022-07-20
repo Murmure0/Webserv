@@ -8,6 +8,7 @@ webserv::webserv(void)
 
 webserv::~webserv(void)
 {
+	close_sockets();
 	servers.clear();
 }
 
@@ -82,6 +83,8 @@ void webserv::config(std::string config_file)
 				std::pair<int, int> port_pair(stoi(pair.second.get_id()), 0);
 				listen_socket sock(stoi(pair.second.get_id()));
 				_listen_sockets.push_back(sock);
+
+				// std::cout << "heheheheheh: " << stoi(pair.second.get_id()) << std::endl;
 				port_pair.first = stoi(pair.second.get_id());
 				port_pair.second = 0;
 				port_count.insert(port_pair);
@@ -101,9 +104,64 @@ void webserv::config(std::string config_file)
 	}
 }
 
-void webserv::run(void)
+void webserv::run(int test)
 {
-	std::cout << "Server running : listening on port 8080 (test bis)" << std::endl;
+	std::cout << "~*~ Server running ~*~" << std::endl;
+	std::cout << "Listening on ports (server name) : " << std::endl;
+
+	for (std::map<std::string, server>::const_iterator i = servers.begin(); i != servers.end(); i++)
+	{
+		std::cout << (*i).first << " (" << (*i).second.get_server_name() << ")" << std::endl;
+	}
 
 	handle_client_connection();
 }
+
+void webserv::close_sockets(void)
+{
+	for (std::vector<listen_socket>::iterator it = _listen_sockets.begin(); it != _listen_sockets.end(); it++)
+	{
+		// std::cout << "closing _sockfd : " << it->get_fd() << std::endl;
+		close(it->get_fd());
+	}
+	servers.clear();
+}
+
+// void webserv::run(void)
+// {
+// 	std::cout << "Server running : listening on port 8080 (test)" << std::endl;
+
+// 	// Trouver les ports dans les serveurs :
+// 	// server &server_one = this->servers.find("id_server")->second;
+// 	// std::string const &port_one = server_one.get_id();
+// 	// int port_int = atoi(port_one.c_str());
+
+// 	// Pour l'instant on écoute sur le port 8080 de maniere arbitraire :
+// 	int port = 8080;
+// 	int backlog = 10; // maximum length to which the queue of pending connections for sockfd may grow.
+
+// 	// Une struct sockaddr permet d'indiquer :
+// 	// - AF_NET : on va utiliser des IPv4
+// 	// - INADDR_ANY : on va travailler avec tous les IP dispo
+// 	// - htons(port) : "host to network, short" traduit notre num de port en un nombre avec l'ordre de byte du network == compatibilité quelque soit les machine emetrice/receptrice avec lesquelles on bossera
+
+// 	// on initialisera une struct sockaddr / port
+// 	sockaddr_in sockaddr;
+// 	bzero(&sockaddr, sizeof(sockaddr));
+// 	sockaddr.sin_family = AF_INET;
+// 	sockaddr.sin_addr.s_addr = INADDR_ANY;
+// 	sockaddr.sin_port = htons(port); // htons is necessary to convert a number to
+// 									 // network byte order
+
+// 	// on initialise le(s) serveurs avec les données trouvées dans le fichier de config
+// 	int server_fd = setup_server(port, backlog, sockaddr); // pour un seul serveur pour l'instant
+// 	if (server_fd < 0)
+// 	{
+// 		throw(ServerInitFailed());
+// 	}
+
+// 	// on gere les connections clients
+// 	handle_client_connection(server_fd, sockaddr);
+
+// 	close(server_fd);
+// }
