@@ -72,6 +72,11 @@ std::string server::get_id(void) const
 	return std::to_string(_port);
 }
 
+std::string	server::get_server_name(void) const
+{
+	return (_server_name);	
+}
+
 void server::add_location(std::pair<std::string, location> l_pair)
 {
 	_locations.insert(l_pair);

@@ -171,16 +171,15 @@ int webserv::handle_client_connection(void)
 			if (FD_ISSET(i, &ready_sockets))
 			{
 				std::vector<listen_socket>::iterator it = find(_listen_sockets.begin(), _listen_sockets.end(), i);
-				if (it != _listen_sockets.end())
+				if (it != _listen_sockets.end()) //on determine si un fd server a été interpelé par un client
 				{
 					int client_socket = accept_new_connection((*it).get_fd(), (*it).get_addr());
-					FD_SET(client_socket, &current_sockets);
+					FD_SET(client_socket, &current_sockets); //on ajoute le fd du client dans les currents sockets à surveiller par select
 				}
 				else
 				{
-					// do what you want with the connection :
-					handle_connection(i);
-					FD_CLR(i, &current_sockets);
+					handle_connection(i); //on fait ce qu'on a a faire avec le client
+					FD_CLR(i, &current_sockets); //on enleve le client socket des current_sockets une fois qu'on a terminé ce qu'on avait a faire avec lui
 				}
 			}
 		}

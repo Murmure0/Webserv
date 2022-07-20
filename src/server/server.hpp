@@ -25,6 +25,7 @@ public:
 	void set(std::string key, bool value);
 
 	std::string get_id(void) const;
+	std::string	get_server_name(void) const;
 	void add_location(std::pair<std::string, location> l_pair);
 
 private:
