@@ -55,14 +55,22 @@ public:
 		if (_body.size() == _content_size)
 		{
 			_request_completed = true;
-			std::cout << "_header: " << _header << std::endl;
-			std::cout << "_body: " << _body << std::endl;
 		}
 	}
 
 	bool is_completed(void) const
 	{
 		return _request_completed;
+	}
+
+	std::string get_header(void) const
+	{
+		return _header;
+	}
+
+	std::string get_body(void) const
+	{
+		return _body;
 	}
 
 private:
