@@ -130,6 +130,21 @@ int webserv::handle_client_connection(void)
 		else if (ret == 0)
 		{
 			// std::cout << &ready_read_sockets << std::endl;
+			for (std::map<int, request>::iterator i = open_requests.begin(); i != open_requests.end(); i++)
+			{
+				std::ifstream infile("./default_error_pages/408.html");
+				std::stringstream ss;
+				std::string str_resp;
+
+				ss << infile.rdbuf();
+
+				// adding the minimal http header-ever to the file content:
+				str_resp = "HTTP/1.1 408 Request Timeout\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: text/html" + "\r\n\r\n" + ss.str() + "\r\n";
+				infile.close();
+
+				int len = str_resp.size();
+				send((*i).first, (char *)str_resp.c_str(), len, 0);
+			}
 			for (std::map<int, responce>::iterator i = open_responces.begin(); i != open_responces.end(); i++)
 			{
 				close((*i).first);

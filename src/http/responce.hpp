@@ -24,10 +24,6 @@ public:
 			else
 				_current_mime = std::string("text/html");
 		}
-		else
-		{
-			_current_mime = std::string("text/html");
-		}
 	};
 	~responce(void);
 	responce(responce const &copy);
@@ -35,8 +31,38 @@ public:
 
 	std::string geterate_responce(void)
 	{
+
+		if (_current_mime.size() == 0)
+		{
+			if (!_config.autoindex)
+				return generate_404();
+			return generate_auto_index(_config.path, _config.url);
+		}
 		return generate_get_responce();
 	};
+
+	std::string generate_auto_index(std::string path, std::string url) const
+	{
+		std::string ret_str = "<!DOCTYPE html><html lang='en'><head><meta charset='utf-8'><title> Index of" + path + "</title></head><body>";
+		DIR *cd;
+		struct dirent *ci;
+
+		ret_str += "<h1>Index of " + path + "</h1>";
+		cd = opendir(path.c_str());
+		if (!cd)
+			return generate_404();
+
+		ci = readdir(cd);
+		while (ci)
+		{
+			ret_str += "<a href='" + (url == "/" ? "/" : url + "/") + std::string(ci->d_name) + "'>" + std::string(ci->d_name) + "</a></br>";
+			ci = readdir(cd);
+		}
+
+		ret_str += "</body></html>";
+
+		return "HTTP/1.1 200 OK\r\n\r\n" + ret_str + "\r\n";
+	}
 
 	std::string generate_get_responce(void) const
 	{
@@ -50,7 +76,7 @@ public:
 		std::stringstream ss;
 		std::string str_resp;
 
-		std::cout << _config.path << " " << _current_mime << std::endl;
+		// std::cout << _config.path << " " << _current_mime << std::endl;
 
 		ss << infile.rdbuf();
 
@@ -66,7 +92,7 @@ public:
 		std::stringstream ss;
 		std::string str_resp;
 
-		std::cout << _config.path << std::endl;
+		// std::cout << _config.path << std::endl;
 
 		ss << infile.rdbuf();
 

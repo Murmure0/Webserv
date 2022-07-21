@@ -58,7 +58,8 @@ t_config get_next_variable(std::string str)
 	if (line.find_first_of('{') == std::string::npos)
 	{
 		config.key = trim(line.substr(0, line.find_first_of(' ')));
-		config.value = trim(line.substr(line.find_first_of(' ')));
+		if (line.find_first_of(' ') != std::string::npos)
+			config.value = trim(line.substr(line.find_first_of(' ')));
 	}
 	else
 	{

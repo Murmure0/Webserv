@@ -67,5 +67,5 @@ void location::set(std::string key, std::string value)
 	else if (key == "max_body_size")
 		_max_body_size = atol(value.c_str());
 	else if (key == "autoindex")
-		_autoindex = value == std::string("true") ? true : false;
+		_autoindex = true;
 }

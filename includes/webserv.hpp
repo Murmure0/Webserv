@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <csignal>
 #include <cstdlib>
+#include <dirent.h>
 
 #ifdef __linux
 #include <linux/limits.h>
@@ -26,6 +27,7 @@
 
 typedef struct config
 {
+	std::string url;
 	std::string method;
 	std::string path;
 	std::string root;

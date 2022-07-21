@@ -43,6 +43,7 @@ public:
 		}
 		location *loc = selected->get_location(path);
 		t_responce_config config;
+		config.url = path;
 		if (loc)
 		{
 			selected->config_responce(&config);
@@ -54,11 +55,12 @@ public:
 			selected->config_responce(&config);
 			config.path += rtrim(path, "/");
 		}
-		std::cout << config.path << " " << config.root << std::endl;
+		// std::cout << config.path << " " << config.root << " " << config.index << std::endl;
 		if (config.path == config.root && config.index.size())
 		{
 			config.path = complete_url(config.path, config.index);
 		}
+		// std::cout << config.path << std::endl;
 		return config;
 	}
 
