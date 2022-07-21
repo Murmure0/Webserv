@@ -5,6 +5,7 @@
 
 #include <string>
 #include <iostream>
+#include "../../includes/webserv.hpp"
 
 class location
 {

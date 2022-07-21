@@ -20,7 +20,7 @@ public:
 		if (content_size_pos != std::string::npos)
 		{
 			std::string sub = header.substr(content_size_pos + 16);
-			_content_size = std::stoi(sub.substr(0, sub.find("\n")));
+			_content_size = atoi(sub.substr(0, sub.find("\n")).c_str());
 		}
 		else
 		{
@@ -75,9 +75,9 @@ public:
 
 private:
 	std::string _header, _body;
-	size_t _content_size = -1;
-	bool _header_completed = false;
-	bool _request_completed = false;
+	size_t _content_size;
+	bool _header_completed;
+	bool _request_completed;
 };
 
 #endif // REQUEST_H

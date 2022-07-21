@@ -62,19 +62,19 @@ void server::set(std::string key, std::string value)
 		_max_body_size = atol(value.c_str());
 	}
 	else if (key == "listen")
-		_port = std::stoi(value);
+		_port = atoi(value.c_str());
 	else if (key == "autoindex")
 		_autoindex = value == std::string("true") ? true : false;
 }
 
 std::string server::get_id(void) const
 {
-	return std::to_string(_port);
+	return ft_to_string(_port);
 }
 
-std::string	server::get_server_name(void) const
+std::string server::get_server_name(void) const
 {
-	return (_server_name);	
+	return (_server_name);
 }
 
 void server::add_location(std::pair<std::string, location> l_pair)

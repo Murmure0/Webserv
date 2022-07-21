@@ -14,6 +14,7 @@
 #include <fcntl.h>
 #include <algorithm>
 #include <csignal>
+#include <cstdlib>
 
 #ifdef __linux
 #include <linux/limits.h>
@@ -41,3 +42,5 @@ void print_line(t_config line);
 int setup_server(int port, int backlog, sockaddr_in sockaddr);
 int accept_new_connection(int server_fd);
 void handle_connection(int client_socket);
+
+std::string ft_to_string(size_t i);

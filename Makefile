@@ -3,7 +3,7 @@ NAME = webserv
 
 CC = c++
 
-CXXFLAGS =
+CXXFLAGS = -std=c++98
 
 RM = rm -rf
 
@@ -17,6 +17,7 @@ SOURCES = 	./src/parsing_main.cpp \
 			./src/utils/running_server/handle_client_connection.cpp \
 			./src/http/request.cpp \
 			./src/http/responce.cpp \
+			./includes/ft.cpp \
 
 
 OBJECTS = $(SOURCES:%.cpp=%.o)

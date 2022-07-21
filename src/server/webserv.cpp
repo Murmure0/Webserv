@@ -78,22 +78,22 @@ void webserv::config(std::string config_file)
 				else
 					break;
 			}
-			if (port_count.find(stoi(pair.second.get_id())) == port_count.end())
+			if (port_count.find(atoi(pair.second.get_id().c_str())) == port_count.end())
 			{
-				std::pair<int, int> port_pair(stoi(pair.second.get_id()), 0);
-				listen_socket sock(stoi(pair.second.get_id()));
+				std::pair<int, int> port_pair(atoi(pair.second.get_id().c_str()), 0);
+				listen_socket sock(atoi(pair.second.get_id().c_str()));
 				_listen_sockets.push_back(sock);
 
 				// std::cout << "heheheheheh: " << stoi(pair.second.get_id()) << std::endl;
-				port_pair.first = stoi(pair.second.get_id());
+				port_pair.first = atoi(pair.second.get_id().c_str());
 				port_pair.second = 0;
 				port_count.insert(port_pair);
 				pair.first = pair.second.get_id() + "_0";
 			}
 			else
 			{
-				(*port_count.find(stoi(pair.second.get_id()))).second += 1;
-				pair.first = pair.second.get_id() + "_" + std::to_string((*port_count.find(stoi(pair.second.get_id()))).second);
+				(*port_count.find(atoi(pair.second.get_id().c_str()))).second += 1;
+				pair.first = pair.second.get_id() + "_" + ft_to_string((*port_count.find(atoi(pair.second.get_id().c_str()))).second);
 			}
 			servers.insert(pair);
 		}

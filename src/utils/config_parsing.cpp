@@ -22,7 +22,7 @@ std::string trim(const std::string &s)
 
 std::string file_to_string(std::string file_path)
 {
-	std::ifstream t(file_path);
+	std::ifstream t(file_path.c_str());
 	std::stringstream buffer;
 	buffer << t.rdbuf();
 	return buffer.str();
