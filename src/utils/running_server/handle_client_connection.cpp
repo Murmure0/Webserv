@@ -129,7 +129,7 @@ int webserv::handle_client_connection(void)
 		}
 		else if (ret == 0)
 		{
-			std::cout << &ready_read_sockets << std::endl;
+			// std::cout << &ready_read_sockets << std::endl;
 		}
 
 		// wait for, and eventually accept and handle an incoming connection
@@ -138,41 +138,20 @@ int webserv::handle_client_connection(void)
 		{
 			if (FD_ISSET((*i).first, &ready_write_sockets))
 			{
-				if ((*i).second.is_image)
-				{
-					std::cout << "Hey" << std::endl;
-					std::ifstream infile("./website/ressources/test.gif");
-					std::stringstream ss;
-					std::string str_resp;
+				std::ifstream infile("./website/ressources/index.html");
+				std::stringstream ss;
+				std::string str_resp;
 
-					ss << infile.rdbuf();
+				ss << infile.rdbuf();
 
-					// adding the minimal http header-ever to the file content:
-					str_resp = "HTTP/1.1 200 OK\nContent-Type:image/png\r\n\r\n" + ss.str() + "\r\n";
+				// adding the minimal http header-ever to the file content:
+				str_resp = "HTTP/1.1 200 OK\r\n\r\n" + ss.str() + "\r\n";
 
-					int len = str_resp.size();
+				int len = str_resp.size();
 
-					// sending to client :
-					send((*i).first, (char *)str_resp.c_str(), len, 0);
-					infile.close();
-				}
-				else
-				{
-					std::ifstream infile("./website/ressources/index.html");
-					std::stringstream ss;
-					std::string str_resp;
-
-					ss << infile.rdbuf();
-
-					// adding the minimal http header-ever to the file content:
-					str_resp = "HTTP/1.1 200 OK\r\n\r\n" + ss.str() + "\r\n";
-
-					int len = str_resp.size();
-
-					// sending to client :
-					send((*i).first, (char *)str_resp.c_str(), len, 0);
-					infile.close();
-				}
+				// sending to client :
+				send((*i).first, (char *)str_resp.c_str(), len, 0);
+				infile.close();
 
 				open_responces.erase(i);
 				close((*i).first);
