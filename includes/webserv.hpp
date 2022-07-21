@@ -24,15 +24,12 @@
 
 #define BUFFER_SIZE 65536
 
-#include "../src/http/request.hpp"
-#include "../src/http/responce.hpp"
-
 typedef struct config
 {
-	std::string _method;
-	std::string _path;
-	size_t _max_body_size;
-	bool _autoindex;
+	std::string method;
+	std::string path;
+	size_t max_body_size;
+	bool autoindex;
 } t_responce_config;
 
 typedef struct config_parsing
@@ -52,3 +49,6 @@ int accept_new_connection(int server_fd);
 void handle_connection(int client_socket);
 
 std::string ft_to_string(size_t i);
+
+#include "../src/http/request.hpp"
+#include "../src/http/responce.hpp"

@@ -18,8 +18,22 @@ public:
 	void print(void) const;
 
 	void set(std::string key, std::string value);
-	void set(std::string key, size_t value);
-	void set(std::string key, bool value);
+
+	std::string get_location_match(void)
+	{
+		return _location_match;
+	}
+
+	void config_responce(t_responce_config *config)
+	{
+		(*config).autoindex = _autoindex;
+		if (_max_body_size != 0)
+			(*config).max_body_size = _max_body_size;
+		if (_method.size() != 0)
+			(*config).method = _method;
+		if (_root.size() != 0)
+			(*config).path = _root;
+	}
 
 private:
 	std::string _location_match;

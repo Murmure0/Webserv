@@ -30,7 +30,7 @@ public:
 	static int accept_new_connection(int server_fd, sockaddr_in sockaddr);
 	static void handle_connection(int client_socket);
 
-	void generate_config(std::string host, std::string path)
+	t_responce_config generate_config(std::string host, std::string path)
 	{
 		server *selected = NULL;
 		if (servers_name_to_server.find(host) != servers_name_to_server.end())
@@ -41,19 +41,20 @@ public:
 		{
 			selected = &servers[host.substr(host.find(":") + 1) + "_0"];
 		}
-		std::cout << path << std::endl;
 		location *loc = selected->get_location(path);
 		t_responce_config config;
 		if (loc)
 		{
 			selected->config_responce(&config);
-			config._path += path;
+			loc->config_responce(&config);
+			config.path += path.substr(loc->get_location_match().size());
 		}
 		else
 		{
 			selected->config_responce(&config);
-			config._path += path;
+			config.path += path;
 		}
+		return config;
 	}
 
 	std::map<std::string, std::string> *get_mime(void)

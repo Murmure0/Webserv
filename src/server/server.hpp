@@ -47,10 +47,10 @@ public:
 
 	void config_responce(t_responce_config *config)
 	{
-		(*config)._autoindex = _autoindex;
-		(*config)._max_body_size = _max_body_size;
-		(*config)._method = _method;
-		(*config)._path = _root;
+		(*config).autoindex = _autoindex;
+		(*config).max_body_size = _max_body_size;
+		(*config).method = _method;
+		(*config).path = _root;
 	}
 
 private:

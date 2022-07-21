@@ -130,6 +130,20 @@ int webserv::handle_client_connection(void)
 		else if (ret == 0)
 		{
 			// std::cout << &ready_read_sockets << std::endl;
+			for (std::map<int, responce>::iterator i = open_responces.begin(); i != open_responces.end(); i++)
+			{
+				close((*i).first);
+			}
+			open_responces.erase(open_responces.begin(), open_responces.end());
+			for (std::map<int, request>::iterator i = open_requests.begin(); i != open_requests.end(); i++)
+			{
+				if (FD_ISSET((*i).first, &current_sockets))
+				{
+					FD_CLR((*i).first, &current_sockets);
+				}
+				close((*i).first);
+			}
+			open_requests.erase(open_requests.begin(), open_requests.end());
 		}
 
 		// wait for, and eventually accept and handle an incoming connection
@@ -138,20 +152,12 @@ int webserv::handle_client_connection(void)
 		{
 			if (FD_ISSET((*i).first, &ready_write_sockets))
 			{
-				std::ifstream infile("./website/ressources/index.html");
-				std::stringstream ss;
-				std::string str_resp;
-
-				ss << infile.rdbuf();
-
-				// adding the minimal http header-ever to the file content:
-				str_resp = "HTTP/1.1 200 OK\r\n\r\n" + ss.str() + "\r\n";
+				std::string str_resp = (*i).second.geterate_responce();
 
 				int len = str_resp.size();
 
 				// sending to client :
 				send((*i).first, (char *)str_resp.c_str(), len, 0);
-				infile.close();
 
 				open_responces.erase(i);
 				close((*i).first);
@@ -166,8 +172,7 @@ int webserv::handle_client_connection(void)
 				(*i).second.read_and_append((*i).first);
 				if ((*i).second.is_completed())
 				{
-					generate_config((*i).second.get_port_location(), (*i).second.get_path());
-					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(), get_mime());
+					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path()));
 					FD_CLR((*i).first, &current_sockets);
 					open_requests.erase(i);
 					break;
