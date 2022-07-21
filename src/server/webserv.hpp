@@ -30,21 +30,42 @@ public:
 	static int accept_new_connection(int server_fd, sockaddr_in sockaddr);
 	static void handle_connection(int client_socket);
 
+	void generate_config(std::string host, std::string path)
+	{
+		server *selected = NULL;
+		if (servers_name_to_server.find(host) != servers_name_to_server.end())
+		{
+			selected = &servers[servers_name_to_server[host]];
+		}
+		else
+		{
+			selected = &servers[host.substr(host.find(":") + 1) + "_0"];
+		}
+		std::cout << path << std::endl;
+		location *loc = selected->get_location(path);
+		t_responce_config config;
+		if (loc)
+		{
+			selected->config_responce(&config);
+			config._path += path;
+		}
+		else
+		{
+			selected->config_responce(&config);
+			config._path += path;
+		}
+	}
+
+	std::map<std::string, std::string> *get_mime(void)
+	{
+		return &mime;
+	};
+
 private:
 	std::map<std::string, server> servers;
+	std::map<std::string, std::string> servers_name_to_server;
 	std::vector<listen_socket> _listen_sockets;
+	std::map<std::string, std::string> mime;
 };
-
-/*
-
-4000_1
-8888_1
-8888_2
-8888_3
-
-map<string, string>
-4040_localhost 4040_1
-
-*/
 
 #endif // WEBSERV_H

@@ -27,6 +27,14 @@
 #include "../src/http/request.hpp"
 #include "../src/http/responce.hpp"
 
+typedef struct config
+{
+	std::string _method;
+	std::string _path;
+	size_t _max_body_size;
+	bool _autoindex;
+} t_responce_config;
+
 typedef struct config_parsing
 {
 	std::string key;

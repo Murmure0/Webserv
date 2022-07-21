@@ -55,6 +55,7 @@ public:
 		if (_body.size() == _content_size)
 		{
 			_request_completed = true;
+			// std::cout << _header << std::endl;
 		}
 	}
 
@@ -71,6 +72,21 @@ public:
 	std::string get_body(void) const
 	{
 		return _body;
+	}
+
+	std::string get_port_location(void) const
+	{
+		std::string host = _header.substr(_header.find("Host: ") + 6);
+		host = host.substr(0, host.find('\n') - 1);
+		return host;
+	}
+
+	std::string get_path(void) const
+	{
+		std::string path = _header.substr(0, _header.find("\n") - 1);
+		path = path.substr(path.find(" ") + 1);
+		path = path.substr(0, path.find(" "));
+		return path;
 	}
 
 private:

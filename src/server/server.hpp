@@ -29,6 +29,30 @@ public:
 	std::string get_server_name(void) const;
 	void add_location(std::pair<std::string, location> l_pair);
 
+	location *get_location(std::string path)
+	{
+		std::string max_loc;
+
+		for (std::map<std::string, location>::iterator i = _locations.begin(); i != _locations.end(); i++)
+		{
+			if (path.find((*i).first) != std::string::npos && (*i).first.size() > max_loc.size())
+			{
+				max_loc = (*i).first;
+			}
+		}
+		if (max_loc.size() == 0)
+			return NULL;
+		return &_locations[max_loc];
+	}
+
+	void config_responce(t_responce_config *config)
+	{
+		(*config)._autoindex = _autoindex;
+		(*config)._max_body_size = _max_body_size;
+		(*config)._method = _method;
+		(*config)._path = _root;
+	}
+
 private:
 	size_t _port;
 	std::string _server_name;

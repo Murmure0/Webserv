@@ -166,7 +166,8 @@ int webserv::handle_client_connection(void)
 				(*i).second.read_and_append((*i).first);
 				if ((*i).second.is_completed())
 				{
-					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body());
+					generate_config((*i).second.get_port_location(), (*i).second.get_path());
+					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(), get_mime());
 					FD_CLR((*i).first, &current_sockets);
 					open_requests.erase(i);
 					break;
