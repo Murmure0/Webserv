@@ -14,13 +14,6 @@ public:
 	{
 		_config = config;
 		_mime = mime;
-	};
-	~responce(void);
-	responce(responce const &copy);
-	responce &operator=(responce const &rhs);
-
-	std::string geterate_responce(void)
-	{
 		std::string ext;
 		ext = _config.path.substr(_config.path.find_last_of("/"));
 		if (ext.find(".") != std::string::npos)
@@ -35,6 +28,13 @@ public:
 		{
 			_current_mime = std::string("text/html");
 		}
+	};
+	~responce(void);
+	responce(responce const &copy);
+	responce &operator=(responce const &rhs);
+
+	std::string geterate_responce(void)
+	{
 		return generate_get_responce();
 	};
 
