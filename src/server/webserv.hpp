@@ -52,7 +52,12 @@ public:
 		else
 		{
 			selected->config_responce(&config);
-			config.path += path;
+			config.path += rtrim(path, "/");
+		}
+		std::cout << config.path << " " << config.root << std::endl;
+		if (config.path == config.root && config.index.size())
+		{
+			config.path = complete_url(config.path, config.index);
 		}
 		return config;
 	}

@@ -33,9 +33,10 @@ public:
 	{
 		std::string max_loc;
 
+		path += "/";
 		for (std::map<std::string, location>::iterator i = _locations.begin(); i != _locations.end(); i++)
 		{
-			if (path.find((*i).first) != std::string::npos && (*i).first.size() > max_loc.size())
+			if (path.find((*i).first + "/") != std::string::npos && (*i).first.size() > max_loc.size())
 			{
 				max_loc = (*i).first;
 			}
@@ -51,6 +52,8 @@ public:
 		(*config).max_body_size = _max_body_size;
 		(*config).method = _method;
 		(*config).path = _root;
+		(*config).index = _index;
+		(*config).root = _root;
 	}
 
 private:

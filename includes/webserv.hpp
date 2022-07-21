@@ -28,6 +28,8 @@ typedef struct config
 {
 	std::string method;
 	std::string path;
+	std::string root;
+	std::string index;
 	size_t max_body_size;
 	bool autoindex;
 } t_responce_config;
@@ -49,6 +51,11 @@ int accept_new_connection(int server_fd);
 void handle_connection(int client_socket);
 
 std::string ft_to_string(size_t i);
+
+std::string complete_url(std::string base_url, std::string to_add);
+std::string ltrim(const std::string &s, const std::string &set);
+std::string rtrim(const std::string &s, const std::string &set);
+std::string trim(const std::string &s, const std::string &set);
 
 #include "../src/http/request.hpp"
 #include "../src/http/responce.hpp"

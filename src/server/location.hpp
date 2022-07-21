@@ -33,6 +33,10 @@ public:
 			(*config).method = _method;
 		if (_root.size() != 0)
 			(*config).path = _root;
+		if (_index.size() != 0)
+			(*config).index = _index;
+		if (_root.size() != 0)
+			(*config).root = _root;
 	}
 
 private:
