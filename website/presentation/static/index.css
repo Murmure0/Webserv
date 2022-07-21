@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono');
+
+html {
+	--background: #F2F8FD;
+	--surface: #fff;
+	--text: #424242;
+	--strong_text: #000;
+	--secondary_text: #909090;
+	--on_surface: #000;
+	--primary: #00BFA6;
+	--primary_transparent: rgba(0, 191, 166, 0.2);
+	--error: #e23636;
+	--warning: #F7DC6F;
+	--success: #82dd55;
+	--on_primary: #fff;
+	--on_primary_secondary: #D7DBDD;
+	--on_error: #fff;
+	--on_success: #fff;
+	--border_radius: 6px;
+	--divider: #D5DBDB;
+	--divider_light: #EFF2F2;
+	--deactivate: #D5DBDB;
+	--box_shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Roboto Mono', Times, serif;
+}
+
+body {
+	background-color: var(--background);
+	min-height: 100vh;
+}
+
+.main_section {
+	max-width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 0 5vw;
+	padding-top: 10vh;
+}
+
+.main_section h1 {
+	font-size: 4rem;
+	margin-bottom: 2rem;
+	z-index: 1;
+}
+
+.main_section h2 {
+	z-index: 1;
+	margin-bottom: 45vw;
+}
+
+.main_section img {
+	position: absolute;
+	top: 15vh;
+	height: 50vw;
+	width: 50vw;
+}
+
+.made_by {
+	position: absolute;
+	top: 40vh;
+	right: 10vw;
+	z-index: 1;
+	background-color: var(--surface);
+	padding: 2px 4px;
+	border-radius: 5px;
+	box-shadow: var(--box_shadow);
+}
+
+.made_by span {
+	color: #ef4444;
+}
+
+.made_by a {
+	text-decoration: none;
+	color: var(--primary);
+}
+
+.stuffs {
+	background-color: var(--primary_transparent);
+	max-width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 5vh 5vw;
+}
+
+.stuffs h2 {
+	margin-bottom: 4rem;
+}

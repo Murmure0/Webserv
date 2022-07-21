@@ -48,19 +48,26 @@ public:
 		{
 			selected->config_responce(&config);
 			loc->config_responce(&config);
-			config.path += path.substr(loc->get_location_match().size());
+			config.path = complete_url(config.path, path.substr(loc->get_location_match().size()));
 		}
 		else
 		{
 			selected->config_responce(&config);
 			config.path += rtrim(path, "/");
 		}
-		// std::cout << config.path << " " << config.root << " " << config.index << std::endl;
-		if (config.path == config.root && config.index.size())
+		std::cout << config.path << " " << config.root << " " << config.index << std::endl;
+		if (compare_url(config.path, config.root) && config.index.size())
 		{
 			config.path = complete_url(config.path, config.index);
 		}
-		// std::cout << config.path << std::endl;
+		if (loc)
+		{
+			std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | loc: " << loc->get_location_match() << " | " << config.path << std::endl;
+		}
+		else
+		{
+			std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | alone | " << config.path << std::endl;
+		}
 		return config;
 	}
 

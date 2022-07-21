@@ -40,6 +40,10 @@ public:
 			{
 				max_loc = (*i).first;
 			}
+			else if ((*i).first == "/")
+			{
+				max_loc = (*i).first;
+			}
 		}
 		if (max_loc.size() == 0)
 			return NULL;

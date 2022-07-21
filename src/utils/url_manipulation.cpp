@@ -2,11 +2,20 @@
 
 std::string complete_url(std::string base_url, std::string to_add)
 {
-	if (base_url.find_last_of("/") != base_url.size())
+	if (base_url.find_last_of("/") != base_url.size() - 1)
 	{
 		return base_url + "/" + to_add;
 	}
 	return base_url + to_add;
+}
+
+bool compare_url(std::string url1, std::string url2)
+{
+	if (url1.find_last_of("/") != url1.size() - 1)
+		url1 += "/";
+	if (url2.find_last_of("/") != url2.size() - 1)
+		url2 += "/";
+	return url1 == url2;
 }
 
 std::string ltrim(const std::string &s, const std::string &set)
