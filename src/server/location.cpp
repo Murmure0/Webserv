@@ -5,6 +5,7 @@
 location::location(void)
 {
 	this->_autoindex = false;
+	this->_autoindex_set = false;
 	this->_max_body_size = -1;
 }
 
@@ -43,6 +44,7 @@ location::location(location const &to_copy)
 	this->_location_match = to_copy._location_match;
 	this->_root = to_copy._root;
 	this->_uploads = to_copy._uploads;
+	this->_autoindex_set = to_copy._autoindex_set;
 }
 
 location &location::operator=(location const &rhs)
@@ -67,5 +69,11 @@ void location::set(std::string key, std::string value)
 	else if (key == "max_body_size")
 		_max_body_size = atol(value.c_str());
 	else if (key == "autoindex")
-		_autoindex = true;
+	{
+		if (value.empty())
+			_autoindex = true;
+		else
+			_autoindex = (value == "on") ? true : false;
+		_autoindex_set = true;
+	}
 }

@@ -64,7 +64,12 @@ void server::set(std::string key, std::string value)
 	else if (key == "listen")
 		_port = atoi(value.c_str());
 	else if (key == "autoindex")
-		_autoindex = true;
+	{
+		if (value.empty())
+			_autoindex = true;
+		else
+			_autoindex = (value == "on") ? true : false;
+	}
 }
 
 std::string server::get_id(void) const

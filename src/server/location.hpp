@@ -26,7 +26,10 @@ public:
 
 	void config_responce(t_responce_config *config)
 	{
-		(*config).autoindex = _autoindex;
+		if (_autoindex_set)
+		{
+			(*config).autoindex = _autoindex;
+		}
 		if (_max_body_size != 0)
 			(*config).max_body_size = _max_body_size;
 		if (_method.size() != 0)
@@ -48,6 +51,7 @@ private:
 	std::string _directory_listing;
 	size_t _max_body_size;
 	bool _autoindex;
+	bool _autoindex_set;
 };
 
 #endif // LOCATION_H
