@@ -53,6 +53,7 @@ body {
 .main_section h2 {
 	z-index: 1;
 	margin-bottom: 45vw;
+	text-align: center;
 }
 
 .main_section img {
@@ -91,6 +92,26 @@ body {
 	padding: 5vh 5vw;
 }
 
-.stuffs h2 {
-	margin-bottom: 4rem;
+.poss_div {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+	max-width: 100%;
+	padding: 4rem;
+}
+
+.poss_elem {
+	display: flex;
+	flex-direction: row;
+	background-color: var(--surface);
+	margin: 1rem;
+	font-size: 1.4rem;
+	border-radius: var(--border_radius);
+	box-shadow: var(--box_shadow);
+	text-decoration: none;
+	color: var(--text);
+	padding: 10px 15px;
+	text-align: center;
 }
