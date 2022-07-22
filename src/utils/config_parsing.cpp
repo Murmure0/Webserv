@@ -43,14 +43,6 @@ t_config get_next_variable(std::string str)
 
 	config.next_start = 0;
 
-	if (trim(str).empty())
-		return config;
-
-	if (!std::getline(f, line))
-	{
-		return config;
-	}
-
 	while (trim(line).empty())
 	{
 		std::getline(f, line);

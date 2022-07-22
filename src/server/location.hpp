@@ -42,6 +42,11 @@ public:
 			(*config).root = _root;
 	}
 
+	bool have_root(void)
+	{
+		return !_root.empty();
+	}
+
 private:
 	std::string _location_match;
 	std::string _method;

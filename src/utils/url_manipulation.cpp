@@ -2,7 +2,7 @@
 
 std::string complete_url(std::string base_url, std::string to_add)
 {
-	if (base_url.find_last_of("/") != base_url.size() - 1)
+	if (base_url.find_last_of("/") != base_url.size() - 1 && to_add.find("/") != 0)
 	{
 		return base_url + "/" + to_add;
 	}

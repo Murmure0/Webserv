@@ -40,7 +40,13 @@ public:
 
 		if (_method == "DELETE")
 		{
-			// delete method
+			int status;
+			std::cout << "NTHU" << std::endl;
+			status = remove(_config.path.c_str());
+			if (status == 0)
+				return "HTTP/1.1 200 OK\r\n\r\n\r\n";
+			else
+				return "HTTP/1.1 404 Not Found\r\n\r\n\r\n";
 		}
 
 		if (_method == "POST")

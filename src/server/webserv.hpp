@@ -48,7 +48,10 @@ public:
 		{
 			selected->config_responce(&config);
 			loc->config_responce(&config);
-			config.path = complete_url(config.path, path.substr(loc->get_location_match().size()));
+			if (loc->have_root())
+				config.path = complete_url(config.path, path.substr(loc->get_location_match().size()));
+			else
+				config.path = complete_url(config.path, path);
 		}
 		else
 		{
