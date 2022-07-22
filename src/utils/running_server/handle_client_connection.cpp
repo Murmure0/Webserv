@@ -167,16 +167,62 @@ int webserv::handle_client_connection(void)
 		{
 			if (FD_ISSET((*i).first, &ready_write_sockets))
 			{
-				std::string str_resp = (*i).second.geterate_responce();
+				/* working but not exactly how it was required, page img not ok for big img, ok for small ones */
 
+				static std::string str_resp;
+				if (str_resp.size() == 0)
+					 str_resp = (*i).second.geterate_responce();
+		
 				int len = str_resp.size();
+				std::cout << "reponse size = " << len << "|" << std::endl;
 
-				// sending to client :
-				send((*i).first, (char *)str_resp.c_str(), len, 0);
+				while (str_resp.size() != 0)
+				{
+					std::string str_cut = str_resp.substr(0, BUFFER_SIZE);
+					int len_cut = str_cut.size();
+					str_resp.erase(0, BUFFER_SIZE);
+					std::cout << "sent data size : " << len_cut << std::endl;
+					send((*i).first, (char *)str_cut.c_str(), len_cut, 0);
+				}
 
 				open_responces.erase(i);
 				close((*i).first);
 				break;
+
+
+				/* Solution lente, page img non fonctionnelle  */
+
+				// static std::string str_resp;
+				// if (str_resp.size() == 0)
+				// 	 str_resp = (*i).second.geterate_responce();
+		
+				// int len = str_resp.size();
+				// //std::cout << "reponse size = " << len << "|" << std::endl;
+
+				// if (str_resp.size() != 0)
+				// {
+				// 	std::string str_cut = str_resp.substr(0, BUFFER_SIZE);
+				// 	int len_cut = str_cut.size();
+				// 	str_resp.erase(0, BUFFER_SIZE);
+				// 	//std::cout << "sent data size : " << len_cut << std::endl;
+				// 	send((*i).first, (char *)str_cut.c_str(), len_cut, 0);
+				// }
+
+				// open_responces.erase(i);
+				// close((*i).first);
+				// break; 
+
+
+
+				/* ancienne version : petit img charge, pas la grande*/ 
+				// std::string str_resp = (*i).second.geterate_responce();
+
+				// int len = str_resp.size();
+				// send((*i).first, (char *)str_resp.c_str(), len, 0);
+
+				// open_responces.erase(i);
+				// close((*i).first);
+				// break; 
 			}
 		}
 

@@ -41,7 +41,6 @@ public:
 		if (_method == "DELETE")
 		{
 			int status;
-			std::cout << "NTHU" << std::endl;
 			status = remove(_config.path.c_str());
 			if (status == 0)
 				return "HTTP/1.1 200 OK\r\n\r\n\r\n";
@@ -54,6 +53,8 @@ public:
 			// post method
 		}
 
+		//std::cout << "curent MIME :" << _current_mime << std::endl;
+		
 		if (_current_mime.size() == 0)
 		{
 			if (!_config.autoindex)
