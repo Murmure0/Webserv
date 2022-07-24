@@ -7,6 +7,9 @@ listen_socket::listen_socket(void)
 	// unused
 }
 
+/*
+setup the socket by creating one and bind it on the given port
+*/
 listen_socket::listen_socket(int port) : _port(port)
 {
 

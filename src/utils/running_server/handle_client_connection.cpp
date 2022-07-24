@@ -13,80 +13,11 @@ int webserv::accept_new_connection(int server_fd, sockaddr_in sockaddr)
 	return connection;
 }
 
-void webserv::handle_connection(int client_socket)
-{
-	// Read from the connection : here will be Parsing client response
-
-	request req;
-
-	char buffer[4096];
-	size_t bytes_read = 4096;
-	std::string buff;
-
-	while (buff.find("\r\n\r\n") == std::string::npos && bytes_read >= 4095)
-	{
-		bytes_read = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
-		buffer[bytes_read] = 0;
-		buff += std::string(buffer, bytes_read);
-	}
-
-	// req.config(buff.substr(0, buff.find("\r\n\r\n")));
-	buff = buff.substr(buff.find("\r\n\r\n") + 4);
-
-	char body_buffer[65536];
-	bytes_read = bytes_read == 4095 ? 65536 : 0;
-	while (bytes_read >= 65535)
-	{
-		bytes_read = recv(client_socket, body_buffer, sizeof(body_buffer) - 1, 0);
-		buffer[bytes_read] = 0;
-		buff += std::string(buffer, bytes_read);
-	}
-
-	std::cout << buff.size() << std::endl;
-
-	// std::cout << "The request message was: " << buff.find("\r\n\r\n") << "  " << bytes_read;
-	//  ici commence l'utilisation de notre classe server
-	std::cout << std::endl;
-
-	fflush(stdout);
-
-	// Whatever the client is asking, giving the content of index.html, img not working, don't know why yet :
-	// opening and reading from the file like a N00b, don't hesitate to correct me :)
-
-	std::ifstream infile("./website/ressources/index.html");
-	if (!infile.good())
-	{
-		std::cout << "Wrong filename." << std::endl;
-		return;
-	}
-	else if (infile.peek() == EOF)
-	{
-		std::cout << "Empty file." << std::endl;
-		return;
-	}
-	std::stringstream ss;
-	std::string str_resp;
-
-	ss << infile.rdbuf();
-
-	// adding the minimal http header-ever to the file content:
-	str_resp = "HTTP/1.1 200 OK\r\n\r\n" + ss.str() + "\r\n";
-
-	int len = str_resp.size();
-
-	// sending to client :
-	send(client_socket, (char *)str_resp.c_str(), len, 0);
-
-	infile.close();
-	close(client_socket);
-	return;
-}
-
+/*
+function that handle all sockets
+*/
 int webserv::handle_client_connection(void)
 {
-	// J'ai tout vu la dedans : https://www.youtube.com/watch?v=Y6pFtgRdUts&t=1s
-
-	// Initialize var & macro for using select() later
 	fd_set current_sockets;
 	fd_set ready_read_sockets;
 	fd_set ready_write_sockets;
@@ -99,19 +30,19 @@ int webserv::handle_client_connection(void)
 	FD_ZERO(&current_sockets);
 
 	// ADD server socket to the current set of fd
-	// Later : ADD all other server_fd
 	for (std::vector<listen_socket>::iterator i = _listen_sockets.begin(); i != _listen_sockets.end(); i++)
 	{
 		FD_SET((*i).get_fd(), &current_sockets);
 	}
 
-	// handling client connection :
+	// handling client connection
 	while (true)
 	{
 		// select() is destructive, we're keeping the fd we're following in current_socket
 		// and selecting from ready_sockets;
 		ready_read_sockets = current_sockets;
 
+		// add open responce to ready write sockets.
 		FD_ZERO(&ready_write_sockets);
 		for (std::map<int, responce>::iterator i = open_responces.begin(); i != open_responces.end(); i++)
 			FD_SET((*i).first, &ready_write_sockets);
@@ -130,6 +61,8 @@ int webserv::handle_client_connection(void)
 		else if (ret == 0)
 		{
 			// std::cout << &ready_read_sockets << std::endl;
+			// handle times out
+			// clear responces and send to them 408 error
 			for (std::map<int, request>::iterator i = open_requests.begin(); i != open_requests.end(); i++)
 			{
 				std::ifstream infile("./default_error_pages/408.html");
@@ -150,6 +83,7 @@ int webserv::handle_client_connection(void)
 				close((*i).first);
 			}
 			open_responces.erase(open_responces.begin(), open_responces.end());
+			// close open requests
 			for (std::map<int, request>::iterator i = open_requests.begin(); i != open_requests.end(); i++)
 			{
 				if (FD_ISSET((*i).first, &current_sockets))
@@ -167,19 +101,23 @@ int webserv::handle_client_connection(void)
 		{
 			if (FD_ISSET((*i).first, &ready_write_sockets))
 			{
+				// save in the responce. Once save don't call anymore
 				std::string str_resp = (*i).second.geterate_responce();
 
 				int len = str_resp.size();
 
 				// sending to client :
+				// call new function in responce to get BUFFERSIZE each time
 				send((*i).first, (char *)str_resp.c_str(), len, 0);
 
+				// errase responce
 				open_responces.erase(i);
 				close((*i).first);
 				break;
 			}
 		}
 
+		// loop in open requests and fill in all of them
 		for (std::map<int, request>::iterator i = open_requests.begin(); i != open_requests.end(); i++)
 		{
 			if (FD_ISSET((*i).first, &ready_read_sockets))
@@ -195,8 +133,10 @@ int webserv::handle_client_connection(void)
 			}
 		}
 
+		// loop in listen sockets which are the main sockets
 		for (std::vector<listen_socket>::iterator i = _listen_sockets.begin(); i != _listen_sockets.end(); i++)
 		{
+			// if socket ready create socket
 			if (FD_ISSET((*i).get_fd(), &ready_read_sockets))
 			{
 				int client_socket = accept_new_connection((*i).get_fd(), (*i).get_addr());

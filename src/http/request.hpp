@@ -28,6 +28,9 @@ public:
 		}
 	};
 
+	/*
+	this function will fill the request object by reading BUFFER_SIZE by BUFFER_SIZE char on specific fd
+	*/
 	void read_and_append(int fd)
 	{
 		char buffer[BUFFER_SIZE];
@@ -36,12 +39,15 @@ public:
 		if (_request_completed)
 			return;
 		bytes_read = recv(fd, buffer, BUFFER_SIZE - 1, 0);
+		// if header is not fully received
 		if (!_header_completed)
 		{
+			// append and check if end of header present
 			_header += std::string(buffer, bytes_read);
 			if (_header.find("\r\n\r\n") != std::string::npos)
 			{
 				// std::cout << _header.substr(0, _header.find("\n") - 1) << std::endl;
+				// if end of header set header completed and add in body the part of body in the string we have (after /n/r/n/r)
 				_header_completed = true;
 				_body = _header.substr(_header.find("\r\n\r\n") + 4);
 				_header = _header.substr(0, _header.find("\r\n\r\n"));
@@ -75,6 +81,10 @@ public:
 		return _body;
 	}
 
+	/*
+	get string between host: and the next space
+	this string look like: localhost:4040
+	*/
 	std::string get_port_location(void) const
 	{
 		std::string host = _header.substr(_header.find("Host: ") + 6);
@@ -82,6 +92,9 @@ public:
 		return host;
 	}
 
+	/*
+	get asked ressources
+	*/
 	std::string get_path(void) const
 	{
 		std::string path = _header.substr(0, _header.find("\n") - 1);

@@ -24,6 +24,9 @@ public:
 		return _location_match;
 	}
 
+	/*
+	used to overide server config
+	*/
 	void config_responce(t_responce_config *config)
 	{
 		if (_autoindex_set)

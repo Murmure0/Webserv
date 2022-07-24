@@ -25,27 +25,28 @@ public:
 	void close_sockets(void);
 
 	static int setup_server(int port, int backlog, sockaddr_in sockaddr);
-	static int handle_client_connection(int server_fd, sockaddr_in sockaddr);
 	int handle_client_connection(void);
 	static int accept_new_connection(int server_fd, sockaddr_in sockaddr);
-	static void handle_connection(int client_socket);
 
+	/*
+	this function will generate the config structure used by the responce class
+	*/
 	t_responce_config generate_config(std::string host, std::string path)
 	{
 		server *selected = NULL;
+		// if hostname match with server use this server. If not use defalt server with this port
 		if (servers_name_to_server.find(host) != servers_name_to_server.end())
-		{
 			selected = &servers[servers_name_to_server[host]];
-		}
 		else
-		{
 			selected = &servers[host.substr(host.find(":") + 1) + "_0"];
-		}
+
+		// get location that match with path if exist
 		location *loc = selected->get_location(path);
 		t_responce_config config;
 		config.url = path;
 		if (loc)
 		{
+			// get config from server and overide it with location
 			selected->config_responce(&config);
 			loc->config_responce(&config);
 			if (loc->have_root())
@@ -55,10 +56,12 @@ public:
 		}
 		else
 		{
+			// get config from server
 			selected->config_responce(&config);
 			config.path += rtrim(path, "/");
 		}
 		std::cout << config.path << " " << config.root << " " << config.index << std::endl;
+		// add index if exist
 		if (compare_url(config.path, config.root) && config.index.size())
 		{
 			config.path = complete_url(config.path, config.index);

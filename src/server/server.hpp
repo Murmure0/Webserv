@@ -29,6 +29,9 @@ public:
 	std::string get_server_name(void) const;
 	void add_location(std::pair<std::string, location> l_pair);
 
+	/*
+	this function will return the longest location match inside of the server config with the given path
+	*/
 	location *get_location(std::string path)
 	{
 		std::string max_loc;
