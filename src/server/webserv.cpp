@@ -484,7 +484,6 @@ void webserv::run()
 	{
 		std::cout << (*i).first << " (" << (*i).second.get_server_name() << ")" << std::endl;
 	}
-
 	handle_client_connection();
 }
 
@@ -492,7 +491,6 @@ void webserv::close_sockets(void)
 {
 	for (std::vector<listen_socket>::iterator it = _listen_sockets.begin(); it != _listen_sockets.end(); it++)
 	{
-		// std::cout << "closing _sockfd : " << it->get_fd() << std::endl;
 		close(it->get_fd());
 	}
 	servers.clear();

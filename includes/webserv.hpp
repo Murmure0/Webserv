@@ -34,6 +34,7 @@ typedef struct config
 	std::string index;
 	size_t max_body_size;
 	bool autoindex;
+	std::string header;
 } t_responce_config;
 
 typedef struct config_parsing

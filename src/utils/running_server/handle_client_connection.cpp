@@ -48,7 +48,7 @@ int webserv::handle_client_connection(void)
 			FD_SET((*i).first, &ready_write_sockets);
 
 		struct timeval tv;
-		tv.tv_sec = 1;
+		tv.tv_sec = 60;
 		tv.tv_usec = 0;
 
 		ret = select(FD_SETSIZE, &ready_read_sockets, &ready_write_sockets, NULL, &tv);
@@ -60,6 +60,7 @@ int webserv::handle_client_connection(void)
 		}
 		else if (ret == 0)
 		{
+
 			// std::cout << &ready_read_sockets << std::endl;
 			// handle times out
 			// clear responces and send to them 408 error
@@ -101,16 +102,38 @@ int webserv::handle_client_connection(void)
 		{
 			if (FD_ISSET((*i).first, &ready_write_sockets))
 			{
-				// save in the responce. Once save don't call anymore
-				std::string str_resp = (*i).second.geterate_responce();
 
+				std::string str_resp;
+				if (str_resp.size() == 0)
+					 str_resp = (*i).second.geterate_responce();
 				int len = str_resp.size();
+				//std::cout << "reponse size = |" << len << "|" << std::endl;
 
-				// sending to client :
-				// call new function in responce to get BUFFERSIZE each time
-				send((*i).first, (char *)str_resp.c_str(), len, 0);
+				int data_sent=0;
+				while (str_resp.size() != 0)
+				{
+					std::string str_cut = str_resp.substr(0, BUFFER_SIZE);
+					int len_cut = str_cut.size();
+					str_resp.erase(0, BUFFER_SIZE);
+					//std::cout << "sent data size : " << len_cut << std::endl;
 
-				// errase responce
+					send((*i).first, (char *)str_cut.c_str(), len_cut, 0);
+
+					data_sent += len_cut;
+					//std::cout << "data_sent " << data_sent << std::endl;
+				}
+
+				/* old method :*/
+				// // save in the responce. Once save don't call anymore
+				// std::string str_resp = (*i).second.geterate_responce();
+
+				// int len = str_resp.size();
+
+				// // sending to client :
+				// // call new function in responce to get BUFFERSIZE each time
+				// send((*i).first, (char *)str_resp.c_str(), len, 0);
+
+				// erase responce
 				open_responces.erase(i);
 				close((*i).first);
 				break;
@@ -125,7 +148,7 @@ int webserv::handle_client_connection(void)
 				(*i).second.read_and_append((*i).first);
 				if ((*i).second.is_completed())
 				{
-					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path()));
+					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path(), (*i).second.get_header()));
 					FD_CLR((*i).first, &current_sockets);
 					open_requests.erase(i);
 					break;

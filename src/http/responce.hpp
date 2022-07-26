@@ -39,9 +39,10 @@ public:
 	- error page
 	- index page
 	*/
-	std::string geterate_responce(void)
+	std::string geterate_responce()
 	{
 
+		//std::cout << "XXXXXXX : " << _config.header << " Pfiou" << std::endl;
 		if (_config.method.find(_method) == std::string::npos)
 		{
 			return generate_get_responce("./default_error_pages/405.html", "HTTP/1.1", "405 Method Not Allowed", "text/html", true);
@@ -121,7 +122,10 @@ public:
 		ss << infile.rdbuf();
 
 		// adding the minimal http header-ever to the file content:
-		str_resp = http_version + " " + status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + ss.str() + "\r\n";
+
+		str_resp = http_version + " " + status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + ss.str();
+		//std::cout << "longueur du file : " << ft_to_string(ss.str().size()) << std::endl;
+		
 		infile.close();
 		return str_resp;
 	}
@@ -131,6 +135,9 @@ private:
 	t_responce_config _config;
 	std::string _current_mime;
 	std::string _method;
+
+	std::string _header;
+	int _current_length;
 };
 
 #endif // RESPONCE_H

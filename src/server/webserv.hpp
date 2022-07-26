@@ -31,10 +31,10 @@ public:
 	/*
 	this function will generate the config structure used by the responce class
 	*/
-	t_responce_config generate_config(std::string host, std::string path)
+	t_responce_config generate_config(std::string host, std::string path, std::string header)
 	{
 		server *selected = NULL;
-		// if hostname match with server use this server. If not use defalt server with this port
+		// if hostname match with server use this server. If not use default server with this port
 		if (servers_name_to_server.find(host) != servers_name_to_server.end())
 			selected = &servers[servers_name_to_server[host]];
 		else
@@ -74,6 +74,7 @@ public:
 		{
 			std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | alone | " << config.path << std::endl;
 		}
+		config.header = header;
 		return config;
 	}
 
