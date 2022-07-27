@@ -3,8 +3,6 @@
 #ifndef LOCATION_H
 #define LOCATION_H
 
-#include <string>
-#include <iostream>
 #include "../../includes/webserv.hpp"
 
 class location
@@ -16,39 +14,14 @@ public:
 	location &operator=(location const &rhs);
 
 	void print(void) const;
-
 	void set(std::string key, std::string value);
-
-	std::string get_location_match(void)
-	{
-		return _location_match;
-	}
+	std::string get_location_match(void);
 
 	/*
 	used to overide server config
 	*/
-	void config_responce(t_responce_config *config)
-	{
-		if (_autoindex_set)
-		{
-			(*config).autoindex = _autoindex;
-		}
-		if (_max_body_size != 0)
-			(*config).max_body_size = _max_body_size;
-		if (_method.size() != 0)
-			(*config).method = _method;
-		if (_root.size() != 0)
-			(*config).path = _root;
-		if (_index.size() != 0)
-			(*config).index = _index;
-		if (_root.size() != 0)
-			(*config).root = _root;
-	}
-
-	bool have_root(void)
-	{
-		return !_root.empty();
-	}
+	void config_responce(t_responce_config *config);
+	bool have_root(void);
 
 private:
 	std::string _location_match;

@@ -3,8 +3,6 @@
 #ifndef LISTEN_SOCKET_H
 #define LISTEN_SOCKET_H
 
-#include <string>
-#include <iostream>
 #include "../../includes/webserv.hpp"
 
 class listen_socket
