@@ -19,12 +19,12 @@ int webserv::setup_server(int port, int backlog, sockaddr_in sockaddr)
 		return -1;
 	}
 
-	//WORKING ON SELECT BEFORE TRYING / infinite-loop 
-	// /* Allow non-blocking connections, when we will have much more connections */
-	// if (fcntl(sockfd, F_SETFL, O_NONBLOCK) < 0){
-	// 	std::cout << "Failed to set the socket as unblocking." << std::endl;
-	// 	return -1;
-	// }
+	//WORKING ON SELECT BEFORE TRYING / may infinite-loop 
+	/* Allow non-blocking connections, when we will have much more connections */
+	if (fcntl(sockfd, F_SETFL, O_NONBLOCK) < 0){
+		std::cout << "Failed to set the socket as unblocking." << std::endl;
+		return -1;
+	}
 	
 	/* Connect the stream socket (socketfd) to the port listened by the server*/
 	if (bind(sockfd, (struct sockaddr*)&sockaddr, sizeof(sockaddr)) < 0) {

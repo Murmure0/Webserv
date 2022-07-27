@@ -27,6 +27,14 @@ server::server(server const &to_copy)
 
 server &server::operator=(server const &rhs)
 {
+	this->_autoindex = rhs._autoindex;
+	this->_index = rhs._index;
+	this->_locations = rhs._locations;
+	this->_max_body_size = rhs._max_body_size;
+	this->_method = rhs._method;
+	this->_port = rhs._port;
+	this->_root = rhs._root;
+	this->_server_name = rhs._server_name;
 	return *this;
 }
 
@@ -85,4 +93,35 @@ std::string server::get_server_name(void) const
 void server::add_location(std::pair<std::string, location> l_pair)
 {
 	_locations.insert(l_pair);
+}
+
+location *server::get_location(std::string path)
+{
+	std::string max_loc;
+
+	path += "/";
+	for (std::map<std::string, location>::iterator i = _locations.begin(); i != _locations.end(); i++)
+	{
+		if (path.find((*i).first + "/") != std::string::npos && (*i).first.size() > max_loc.size())
+		{
+			max_loc = (*i).first;
+		}
+		else if ((*i).first == "/")
+		{
+			max_loc = (*i).first;
+		}
+	}
+	if (max_loc.size() == 0)
+		return NULL;
+	return &_locations[max_loc];
+}
+
+void server::config_responce(t_responce_config *config)
+{
+	(*config).autoindex = _autoindex;
+	(*config).max_body_size = _max_body_size;
+	(*config).method = _method;
+	(*config).path = _root;
+	(*config).index = _index;
+	(*config).root = _root;
 }

@@ -104,12 +104,11 @@ int webserv::handle_client_connection(void)
 			{
 
 				std::string str_resp;
-				if (str_resp.size() == 0)
-					 str_resp = (*i).second.geterate_responce();
+				str_resp = (*i).second.geterate_responce();
 				int len = str_resp.size();
 				//std::cout << "reponse size = |" << len << "|" << std::endl;
 
-				int data_sent=0;
+				int data_sent = 0;
 				while (str_resp.size() != 0)
 				{
 					std::string str_cut = str_resp.substr(0, BUFFER_SIZE);
@@ -122,6 +121,27 @@ int webserv::handle_client_connection(void)
 					data_sent += len_cut;
 					//std::cout << "data_sent " << data_sent << std::endl;
 				}
+
+
+
+
+				
+				// int data_sent = 0;
+				// while (len > 0)
+				// {
+				// 	data_sent = send((*i).first,str_resp_char, len, 0);
+				// 	if (data_sent ==0)
+				// 		break;
+				// 	if (data_sent > 0)
+				// 	{
+				// 		data_sent += len;
+				// 		len -= data_sent;
+				// 	}
+				// 	//std::cout << "data_sent " << data_sent << std::endl;
+				// }
+
+				//memset(str_resp, '\0', len);
+
 
 				/* old method :*/
 				// // save in the responce. Once save don't call anymore
@@ -136,6 +156,7 @@ int webserv::handle_client_connection(void)
 				// erase responce
 				open_responces.erase(i);
 				close((*i).first);
+				FD_CLR((*i).first, &current_sockets);
 				break;
 			}
 		}
