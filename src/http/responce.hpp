@@ -25,6 +25,7 @@ public:
 				_current_mime = std::string("text/html");
 		}
 		_method = header.substr(0, header.find(" "));
+		_header = header_to_map(header);
 	};
 	~responce(void);
 	responce(responce const &copy);
@@ -42,7 +43,6 @@ public:
 	std::string geterate_responce()
 	{
 
-		//std::cout << "XXXXXXX : " << _config.header << " Pfiou" << std::endl;
 		if (_config.method.find(_method) == std::string::npos)
 		{
 			return generate_get_responce("./default_error_pages/405.html", "HTTP/1.1", "405 Method Not Allowed", "text/html", true);
@@ -71,6 +71,8 @@ public:
 				return generate_get_responce("./default_error_pages/404.html", "HTTP/1.1", "404 Not Found", "text/html", true);
 			return generate_auto_index(_config.path, _config.url);
 		}
+		if (_config.path.find("?") != std::string::npos)
+			return cgi_execute();
 		return generate_get_responce(_config.path, "HTTP/1.1", "200 OK", _current_mime);
 	};
 
@@ -125,7 +127,7 @@ public:
 
 		str_resp = http_version + " " + status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + ss.str();
 		//std::cout << "longueur du file : " << ft_to_string(ss.str().size()) << std::endl;
-		
+
 		infile.close();
 		return str_resp;
 	}
@@ -135,9 +137,14 @@ private:
 	t_responce_config _config;
 	std::string _current_mime;
 	std::string _method;
+	std::map<std::string, std::string>	_header;
 
-	std::string _header;
 	int _current_length;
+
+	///essais
+	std::string							cgi_execute();
+	std::vector<std::string>			cgi_env();
+	std::map<std::string, std::string>	header_to_map(std::string str);
 };
 
 #endif // RESPONCE_H

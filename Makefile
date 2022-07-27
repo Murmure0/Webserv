@@ -18,6 +18,7 @@ SOURCES = 	./src/parsing_main.cpp \
 			./src/utils/running_server/handle_client_connection.cpp \
 			./src/http/request.cpp \
 			./src/http/responce.cpp \
+			./src/cgi/cgi.cpp \
 			./includes/ft.cpp \
 
 
@@ -33,10 +34,10 @@ $(NAME):	$(OBJECTS)
 clean:
 		@$(RM) $(OBJECTS)
 		@echo "[\033[32m$(NAME) files cleaned !\033[0m]"
-	
+
 fclean: clean
 		@$(RM) $(NAME)
-	
+
 re: fclean all
 
 .PHONY: clean fclean re all

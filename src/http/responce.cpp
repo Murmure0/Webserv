@@ -18,5 +18,6 @@ responce &responce::operator=(responce const &rhs)
 	this->_config = rhs._config;
 	this->_current_mime = rhs._current_mime;
 	this->_method = rhs._method;
+	this->_header = rhs._header;
 	return *this;
 }
