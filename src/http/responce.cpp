@@ -109,17 +109,13 @@ std::string responce::generate_get_responce(std::string path, std::string http_v
 
 	std::stringstream ss;
 	std::string str_resp;
-	std::string str_tmp;
 	const char * str_tmp2;
-	
 
 	ss << infile.rdbuf();
-	str_tmp = ss.str();
-	
+
 	// adding the minimal http header-ever to the file content:
-	// str_resp = http_version + " " + status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + ss.str() + "\r\n";
-	str_resp = http_version + " " + status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + (char *)str_tmp.str();
-	std::cout << ss.str().size() << std::endl;
+	str_resp = http_version + " " + status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + ss.str() + "\r\n";
+	//std::cout << ss.str().size() << std::endl;
 	
 	infile.close();
 	return str_resp;

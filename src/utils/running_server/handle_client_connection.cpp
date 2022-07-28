@@ -98,52 +98,76 @@ int webserv::handle_client_connection(void)
 
 		// wait for, and eventually accept and handle an incoming connection
 
+		// loop on open_responces to send a small part of the response to each client
 		for (std::map<int, responce>::iterator i = open_responces.begin(); i != open_responces.end(); i++)
 		{
 			if (FD_ISSET((*i).first, &ready_write_sockets))
 			{
+				static std::map<int, size_t> data_sent; // map <fd_client, qty_data_already_sent> data_sent
 
-				std::string str_resp;
-				str_resp = (*i).second.geterate_responce();
-				int len = str_resp.size();
-				//std::cout << "reponse size = |" << len << "|" << std::endl;
+				if(!data_sent.count((*i).first))
+					data_sent[(*i).first] = 0;
 
-				int data_sent = 0;
-				while (str_resp.size() != 0)
+				std::string str_send = (*i).second.geterate_responce();
+				int size = std::min((unsigned long)BUFFER_SIZE,(str_send.size() - data_sent[(*i).first]));
+
+				int ret = send ((*i).first, (char *)(str_send.c_str() + data_sent[(*i).first]), size, 0); //sending the string begining at (str + data_already_sent)
+				if (ret == -1) // sending error
 				{
-					std::string str_cut = str_resp.substr(0, BUFFER_SIZE);
-					int len_cut = str_cut.size();
-					str_resp.erase(0, BUFFER_SIZE);
-					//std::cout << "sent data size : " << len_cut << std::endl;
-
-					send((*i).first, (char *)str_cut.c_str(), len_cut, 0);
-
-					data_sent += len_cut;
-					//std::cout << "data_sent " << data_sent << std::endl;
+					open_requests.erase((*i).first);
+					open_responces.erase((*i).first);
+					data_sent[(*i).first] = 0;
+					FD_CLR((*i).first, &current_sockets);
+					FD_CLR((*i).first, &ready_read_sockets);
+					FD_CLR((*i).first, &ready_write_sockets);
+					close((*i).first);
 				}
+				else // we've sent something
+				{
+					data_sent[(*i).first] += ret; // Increasing data_already_sent
+					if (data_sent[(*i).first] >= str_send.size()) // we've finished to sent the body to the buddy
+					{
+						data_sent[(*i).first] = 0;
+						open_requests.erase((*i).first); // NEED REVIEW : not sure which socket FD_CLR &  what to erase
+						open_responces.erase((*i).first);
+					}
+				}
+				ret = 0;
+				break;
 
-
-
-
-				
-				// int data_sent = 0;
-				// while (len > 0)
+				// if (ret2 == 0)
+				// 	open_responces.erase(i);
+				// else if (ret2 == -1)
 				// {
-				// 	data_sent = send((*i).first,str_resp_char, len, 0);
-				// 	if (data_sent ==0)
-				// 		break;
-				// 	if (data_sent > 0)
-				// 	{
-				// 		data_sent += len;
-				// 		len -= data_sent;
-				// 	}
+				// 	FD_CLR((*i).first, &current_sockets);
+				// 	FD_CLR((*i).first, &ready_read_sockets);
+				// 	FD_CLR((*i).first, &ready_write_sockets);
+				// 	open_responces.erase(i);
+				// }
+				// ret = 0;
+				// break;
+
+				/* old method */
+				// std::string str_resp;
+				// str_resp = (*i).second.geterate_responce();
+				// int len = str_resp.size();
+				// //std::cout << "reponse size = |" << len << "|" << std::endl;
+
+				// int data_sent = 0;
+				// while (str_resp.size() != 0)
+				// {
+				// 	std::string str_cut = str_resp.substr(0, BUFFER_SIZE);
+				// 	int len_cut = str_cut.size();
+				// 	str_resp.erase(0, BUFFER_SIZE);
+				// 	//std::cout << "sent data size : " << len_cut << std::endl;
+
+				// 	data_sent = send((*i).first, (char *)str_cut.c_str(), len_cut, 0);
+
+				// 	data_sent += len_cut;
 				// 	//std::cout << "data_sent " << data_sent << std::endl;
 				// }
 
-				//memset(str_resp, '\0', len);
-
-
-				/* old method :*/
+				/* first method :*/
 				// // save in the responce. Once save don't call anymore
 				// std::string str_resp = (*i).second.geterate_responce();
 
@@ -154,10 +178,10 @@ int webserv::handle_client_connection(void)
 				// send((*i).first, (char *)str_resp.c_str(), len, 0);
 
 				// erase responce
-				open_responces.erase(i);
-				close((*i).first);
-				FD_CLR((*i).first, &current_sockets);
-				break;
+				// open_responces.erase(i);
+				// close((*i).first);
+				// FD_CLR((*i).first, &current_sockets);
+				// break;
 			}
 		}
 
