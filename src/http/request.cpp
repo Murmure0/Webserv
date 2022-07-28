@@ -94,3 +94,8 @@ std::string request::get_path(void) const
 	path = path.substr(0, path.find(" "));
 	return path;
 }
+
+size_t		request::get_content_size(void) const
+{
+	return this->_content_size;
+}

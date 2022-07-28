@@ -8,7 +8,7 @@ class responce
 {
 public:
 	responce(void);
-	responce(std::string header, std::string body, std::map<std::string, std::string> *mime, t_responce_config config);
+	responce(std::string header, size_t content_size, std::map<std::string, std::string> *mime, t_responce_config config);
 	~responce(void);
 	responce(responce const &copy);
 	responce &operator=(responce const &rhs);
@@ -41,12 +41,15 @@ private:
 	std::string _method;
 	std::map<std::string, std::string>	_header;
 
-	int _current_length;
-
-	///essais
 	std::string							cgi_execute();
 	std::vector<std::string>			cgi_env();
 	std::map<std::string, std::string>	header_to_map(std::string str);
+	char								**vec_to_char(std::vector<std::string> vec_env);
+
+	///essais
+	size_t								_contentlenght;
+	///a enlever
+	void								print_the_header();
 };
 
 #endif // RESPONCE_H

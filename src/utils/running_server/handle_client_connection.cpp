@@ -125,7 +125,7 @@ int webserv::handle_client_connection(void)
 
 
 
-				
+
 				// int data_sent = 0;
 				// while (len > 0)
 				// {
@@ -169,7 +169,7 @@ int webserv::handle_client_connection(void)
 				(*i).second.read_and_append((*i).first);
 				if ((*i).second.is_completed())
 				{
-					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path(), (*i).second.get_header()));
+					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_content_size(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path(), (*i).second.get_header()));
 					FD_CLR((*i).first, &current_sockets);
 					open_requests.erase(i);
 					break;

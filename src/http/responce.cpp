@@ -10,7 +10,7 @@ responce::~responce(void)
 {
 }
 
-responce::responce(std::string header, std::string body, std::map<std::string, std::string> *mime, t_responce_config config)
+responce::responce(std::string header, size_t content_size, std::map<std::string, std::string> *mime, t_responce_config config)
 {
 	_config = config;
 	_mime = mime;
@@ -25,6 +25,8 @@ responce::responce(std::string header, std::string body, std::map<std::string, s
 			_current_mime = std::string("text/html");
 	}
 	_method = header.substr(0, header.find(" "));
+	_header = header_to_map(header);
+	_contentlenght = content_size;
 };
 
 responce::responce(responce const &to_copy) : _mime(to_copy._mime), _config(to_copy._config), _current_mime(to_copy._current_mime), _method(to_copy._method) {}
@@ -36,6 +38,7 @@ responce &responce::operator=(responce const &rhs)
 	this->_current_mime = rhs._current_mime;
 	this->_method = rhs._method;
 	this->_header = rhs._header;
+	this->_contentlenght = rhs._contentlenght;
 	return *this;
 }
 
@@ -60,7 +63,7 @@ std::string responce::geterate_responce()
 
 	if (_method == "POST")
 	{
-		// post method
+		return cgi_execute();
 	}
 
 	// check if ask for auto index or return statdard get responce
@@ -70,6 +73,8 @@ std::string responce::geterate_responce()
 			return generate_get_responce("./default_error_pages/404.html", "HTTP/1.1", "404 Not Found", "text/html", true);
 		return generate_auto_index(_config.path, _config.url);
 	}
+	if (_config.path.find("?") != std::string::npos)
+		return cgi_execute();
 	return generate_get_responce(_config.path, "HTTP/1.1", "200 OK", _current_mime);
 };
 
@@ -117,9 +122,7 @@ std::string responce::generate_get_responce(std::string path, std::string http_v
 	str_tmp = ss.str();
 
 	// adding the minimal http header-ever to the file content:
-	// str_resp = http_version + " " + status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + ss.str() + "\r\n";
-	str_resp = http_version + " " + status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + (char *)str_tmp.str();
-	std::cout << ss.str().size() << std::endl;
+	str_resp = http_version + " " + status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + ss.str() + "\r\n";
 
 	infile.close();
 	return str_resp;
