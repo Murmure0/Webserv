@@ -10,7 +10,7 @@ responce::~responce(void)
 {
 }
 
-responce::responce(std::string header, size_t content_size, std::map<std::string, std::string> *mime, t_responce_config config)
+responce::responce(std::string header, std::string body, size_t content_size, std::map<std::string, std::string> *mime, t_responce_config config)
 {
 	_config = config;
 	_mime = mime;
@@ -27,6 +27,7 @@ responce::responce(std::string header, size_t content_size, std::map<std::string
 	_method = header.substr(0, header.find(" "));
 	_header = header_to_map(header);
 	_contentlenght = content_size;
+	_body = body;
 };
 
 responce::responce(responce const &to_copy) : _mime(to_copy._mime), _config(to_copy._config), _current_mime(to_copy._current_mime), _method(to_copy._method) {}
@@ -39,6 +40,7 @@ responce &responce::operator=(responce const &rhs)
 	this->_method = rhs._method;
 	this->_header = rhs._header;
 	this->_contentlenght = rhs._contentlenght;
+	this->_body = rhs._body;
 	return *this;
 }
 

@@ -8,7 +8,7 @@ class responce
 {
 public:
 	responce(void);
-	responce(std::string header, size_t content_size, std::map<std::string, std::string> *mime, t_responce_config config);
+	responce(std::string header, std::string body, size_t content_size, std::map<std::string, std::string> *mime, t_responce_config config);
 	~responce(void);
 	responce(responce const &copy);
 	responce &operator=(responce const &rhs);
@@ -39,11 +39,13 @@ private:
 	t_responce_config _config;
 	std::string _current_mime;
 	std::string _method;
+	std::string	_body;
 	std::map<std::string, std::string>	_header;
 
 	std::string							cgi_execute();
 	std::vector<std::string>			cgi_env();
 	std::map<std::string, std::string>	header_to_map(std::string str);
+	void								execute_the_bin(int *fd);
 	char								**vec_to_char(std::vector<std::string> vec_env);
 
 	///essais

@@ -41,6 +41,7 @@ void	responce::print_the_header()
 
 std::vector<std::string>	responce::cgi_env()
 {
+	std::cout << "config : " << _config.path << std::endl;
 	std::vector<std::string>	env;
 	std::string					tmp;
 	char						tmp_path[PATH_MAX];
@@ -100,10 +101,17 @@ std::vector<std::string>	responce::cgi_env()
 
 	///QUERY_STRING: The query information passed to the program.
 	///It is appended to the URL following a question mark (?).
+	///TO DO problem de reception de la query string lors du post
+	///RM : The server MUST set this variable; if the Script-URI does not include
+	///a query component, the QUERY_STRING MUST be defined as an empty
+	///string ("").
 	if (_config.url.find("?") != std::string::npos)
 		env.push_back("QUERY_STRING=" + _config.url.substr(_config.url.find("?") + 1));
+	else
+		env.push_back("QUERY_STRING=" + _body);
 
 	///REMOTE_HOST:The hostname from which the user is making the request.
+	///TO DO ve2rification de pourquoi j'ai pas d'argument
 	env.push_back("REMOTE_HOST=");
 
 
@@ -139,29 +147,47 @@ std::vector<std::string>	responce::cgi_env()
 
 	///HTTP_REFERER:The URL of the document the client points to before accessing the CGI program.
 	env.push_back("HTTP_REFERER=" + _header.at("Referer:"));
-
-
 	/*------------------------------------------------------------------------------------------------------*/
 	return env;
 }
 
 char		**responce::vec_to_char(std::vector<std::string> vec_env)
 {
-	char	**env;
-	int		it = 0;
+	char		**env = new char*[vec_env.size() + 1];
+	size_t		it = 0;
+	const char	*str;
 
-	env = new char*[vec_env.size() + 1];
-	for (std::vector<std::string>::iterator i = vec_env.begin(); i != vec_env.end(); i++, it++)
+	while (it < vec_env.size())
 	{
-		env[it] = i->c_str();
+		env[it] = new char[vec_env[it].size() + 1];
+		str = vec_env[it].c_str();
+		strcpy(env[it], str);
+		it++;
 	}
+	env[it] = NULL;
+	return env;
+}
+
+void	responce::execute_the_bin(int *fd)
+{
+
 
 }
 
 std::string	responce::cgi_execute()
 {
-	std::vector<std::string>	vec_env = cgi_env();
-	char						**env;
+	char	**env = vec_to_char(cgi_env());
+	int		fd[2];
+	pid_t	pid;
 
+	// if (pipe(fd) == -1)
+	// 	///TO DO mettre une erreur mais je sais pas encore quoi
+	// pid = fork();
+	// if (pid == -1)
+	// 	///TO DO mettre erreur
+	// if (pid == 0)
+	// 	///execve
+	// // else
+	// // 	///faire le parent
 	return "coucou";
 }
