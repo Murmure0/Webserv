@@ -10,7 +10,7 @@ responce::~responce(void)
 {
 }
 
-responce::responce(std::string header, std::string body, std::map<std::string, std::string> *mime, t_responce_config config)
+responce::responce(std::string header, std::string body, std::map<std::string, std::string> *mime, t_responce_config config) : _responce_ready(false), _sent(false)
 {
 	_config = config;
 	_mime = mime;
@@ -27,7 +27,7 @@ responce::responce(std::string header, std::string body, std::map<std::string, s
 	_method = header.substr(0, header.find(" "));
 };
 
-responce::responce(responce const &to_copy) : _mime(to_copy._mime), _config(to_copy._config), _current_mime(to_copy._current_mime), _method(to_copy._method) {}
+responce::responce(responce const &to_copy) : _mime(to_copy._mime), _config(to_copy._config), _current_mime(to_copy._current_mime), _method(to_copy._method), _sent(to_copy._sent) {}
 
 responce &responce::operator=(responce const &rhs)
 {
@@ -36,12 +36,16 @@ responce &responce::operator=(responce const &rhs)
 	this->_current_mime = rhs._current_mime;
 	this->_method = rhs._method;
 	this->_header = rhs._header;
+	this->_responce_ready = rhs._responce_ready;
+	this->_responce = rhs._responce;
+	this->_sent = rhs._sent;
 	return *this;
 }
 
-
 std::string responce::geterate_responce()
 {
+	if (_responce_ready)
+		return "";
 	if (_config.method.find(_method) == std::string::npos)
 	{
 		return generate_get_responce("./default_error_pages/405.html", "HTTP/1.1", "405 Method Not Allowed", "text/html", true);
@@ -109,14 +113,41 @@ std::string responce::generate_get_responce(std::string path, std::string http_v
 
 	std::stringstream ss;
 	std::string str_resp;
-	const char * str_tmp2;
+	const char *str_tmp2;
 
 	ss << infile.rdbuf();
 
 	// adding the minimal http header-ever to the file content:
 	str_resp = http_version + " " + status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + ss.str() + "\r\n";
-	//std::cout << ss.str().size() << std::endl;
-	
+	// std::cout << ss.str().size() << std::endl;
+
 	infile.close();
 	return str_resp;
+}
+
+void responce::set_responce(std::string responce)
+{
+	if (!_responce_ready)
+	{
+		_responce = responce;
+		_responce_ready = true;
+	}
+}
+
+std::string responce::cuted_responce(void)
+{
+	std::string cuted = _responce.substr(0, SEND_BUFFER_SIZE - 1);
+
+	if (_responce.size() < SEND_BUFFER_SIZE)
+		_responce = "";
+	else
+		_responce = _responce.substr(SEND_BUFFER_SIZE - 1);
+	if (_responce.size() == 0)
+		_sent = true;
+	return cuted;
+}
+
+bool responce::is_sent(void) const
+{
+	return _sent;
 }

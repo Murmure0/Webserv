@@ -497,51 +497,51 @@ void webserv::close_sockets(void)
 }
 
 t_responce_config webserv::generate_config(std::string host, std::string path, std::string header)
-	{
-		server *selected = NULL;
-		// if hostname match with server use this server. If not use default server with this port
-		if (servers_name_to_server.find(host) != servers_name_to_server.end())
-			selected = &servers[servers_name_to_server[host]];
-		else
-			selected = &servers[host.substr(host.find(":") + 1) + "_0"];
+{
+	server *selected = NULL;
+	// if hostname match with server use this server. If not use default server with this port
+	if (servers_name_to_server.find(host) != servers_name_to_server.end())
+		selected = &servers[servers_name_to_server[host]];
+	else
+		selected = &servers[host.substr(host.find(":") + 1) + "_0"];
 
-		// get location that match with path if exist
-		location *loc = selected->get_location(path);
-		t_responce_config config;
-		config.url = path;
-		if (loc)
-		{
-			// get config from server and overide it with location
-			selected->config_responce(&config);
-			loc->config_responce(&config);
-			if (loc->have_root())
-				config.path = complete_url(config.path, path.substr(loc->get_location_match().size()));
-			else
-				config.path = complete_url(config.path, path);
-		}
+	// get location that match with path if exist
+	location *loc = selected->get_location(path);
+	t_responce_config config;
+	config.url = path;
+	if (loc)
+	{
+		// get config from server and overide it with location
+		selected->config_responce(&config);
+		loc->config_responce(&config);
+		if (loc->have_root())
+			config.path = complete_url(config.path, path.substr(loc->get_location_match().size()));
 		else
-		{
-			// get config from server
-			selected->config_responce(&config);
-			config.path += rtrim(path, "/");
-		}
-		std::cout << config.path << " " << config.root << " " << config.index << std::endl;
-		// add index if exist
-		if (compare_url(config.path, config.root) && config.index.size())
-		{
-			config.path = complete_url(config.path, config.index);
-		}
-		if (loc)
-		{
-			std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | loc: " << loc->get_location_match() << " | " << config.path << std::endl;
-		}
-		else
-		{
-			std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | alone | " << config.path << std::endl;
-		}
-		config.header = header;
-		return config;
+			config.path = complete_url(config.path, path);
 	}
+	else
+	{
+		// get config from server
+		selected->config_responce(&config);
+		config.path += rtrim(path, "/");
+	}
+	// std::cout << config.path << " " << config.root << " " << config.index << std::endl;
+	//  add index if exist
+	if (compare_url(config.path, config.root) && config.index.size())
+	{
+		config.path = complete_url(config.path, config.index);
+	}
+	if (loc)
+	{
+		// std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | loc: " << loc->get_location_match() << " | " << config.path << std::endl;
+	}
+	else
+	{
+		// std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | alone | " << config.path << std::endl;
+	}
+	config.header = header;
+	return config;
+}
 
 std::map<std::string, std::string> *webserv::get_mime(void)
 {

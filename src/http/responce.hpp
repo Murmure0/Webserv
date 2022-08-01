@@ -34,12 +34,21 @@ public:
 	*/
 	std::string generate_get_responce(std::string path, std::string http_version, std::string status, std::string mime, bool not_fail = false) const;
 
+	void set_responce(std::string responce);
+
+	std::string cuted_responce(void);
+
+	bool is_sent(void) const;
+
 private:
 	std::map<std::string, std::string> *_mime;
 	t_responce_config _config;
 	std::string _current_mime;
 	std::string _method;
 	std::string _header;
+	std::string _responce;
+	bool _responce_ready;
+	bool _sent;
 };
 
 #endif // RESPONCE_H
