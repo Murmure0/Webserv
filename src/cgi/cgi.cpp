@@ -168,26 +168,78 @@ char		**responce::vec_to_char(std::vector<std::string> vec_env)
 	return env;
 }
 
-void	responce::execute_the_bin(int *fd)
+
+void	responce::child_process(int *fd_in, int *fd_out, char **env)
 {
+	char *av[3];
+	std::string	tmp = "cgi-bin" + _config.path.substr(_config.path.rfind("/"));
+	if (tmp.find("?") != std::string::npos)
+	{
+		std::cerr << "hey\n" ;
+		tmp.erase(tmp.find("?"));
+	}
+	///TO Do a changer en fonction du langage
+	std::string pyth = "/usr/bin/python2.7";
 
+	av[0] = (char *)pyth.c_str();
+	av[1] = (char *)tmp.c_str();
+	av[2] = NULL;
+	dup2(fd_in[0], 0);
+	dup2(fd_out[1], 1);
+	close(fd_in[0]);
+	close(fd_in[1]);
+	close(fd_out[0]);
+	close(fd_out[1]);
+	execve(av[0], av, env);
+	///TO DO error if the execve fail
+	std::cerr << "The execve failed" << std::endl;
+	exit(1);
+}
 
+std::string	responce::parent_process(pid_t pid, int *fd_in, int *fd_out)
+{
+	int				ret = 1;
+	char			tmp[101] = {0};
+	std::string		str_return;
+
+	dup2(fd_out[0], 0);
+	close(fd_in[0]);
+	close(fd_in[1]);
+	close(fd_out[1]);
+	wait(0);
+	while (ret > 0)
+	{
+		ret = read(fd_out[0], tmp, 100);
+		tmp[ret] = '\0';
+		str_return += std::string(tmp);
+	}
+	std::cout << "ICI : " << str_return << std::endl;
+	return str_return;
 }
 
 std::string	responce::cgi_execute()
 {
+	std::cout << "*****" << std::endl;
+	for (std::map<std::string, std::string>::iterator i = _header.begin(); i != _header.end(); i++)
+		std::cout << i->first << i->second << std::endl;
+	std::cout << _body << std::endl;
+	std::cout << "*****" << std::endl;
+	///TO DO avant il faut vérifier : do it with fstream
 	char	**env = vec_to_char(cgi_env());
-	int		fd[2];
+	int		fd_in[2];
+	int		fd_out[2];
 	pid_t	pid;
 
-	// if (pipe(fd) == -1)
-	// 	///TO DO mettre une erreur mais je sais pas encore quoi
-	// pid = fork();
-	// if (pid == -1)
-	// 	///TO DO mettre erreur
-	// if (pid == 0)
-	// 	///execve
-	// // else
-	// // 	///faire le parent
-	return "coucou";
+	///TO DO mettre une erreur mais je sais pas encore quoi
+	if (pipe(fd_in) == -1)
+		std::cerr << "CGI : Le pipe du FD_IN a foiré" << std ::endl;
+	if (pipe(fd_out) == -1)
+		std::cerr << "CGI : Le pipe du FD_OUT a foiré" << std ::endl;
+	pid = fork();
+	///TO DO mettre erreur
+	if (pid == -1)
+		std::cerr << "CGI : Le fork il a foiré" << std::endl;
+	else if (pid == 0)
+		child_process(fd_in, fd_out, env);
+	return parent_process(pid, fd_in, fd_out);
 }

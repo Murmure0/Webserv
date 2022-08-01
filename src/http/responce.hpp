@@ -45,7 +45,8 @@ private:
 	std::string							cgi_execute();
 	std::vector<std::string>			cgi_env();
 	std::map<std::string, std::string>	header_to_map(std::string str);
-	void								execute_the_bin(int *fd);
+	void								child_process(int *fd_in, int *fd_out, char **env);
+	std::string							parent_process(pid_t pid, int *fd_in, int *fd_out);
 	char								**vec_to_char(std::vector<std::string> vec_env);
 
 	///essais

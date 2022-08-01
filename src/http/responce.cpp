@@ -47,6 +47,7 @@ responce &responce::operator=(responce const &rhs)
 
 std::string responce::geterate_responce()
 {
+	std::string	cgi;
 	if (_config.method.find(_method) == std::string::npos)
 	{
 		return generate_get_responce("./default_error_pages/405.html", "HTTP/1.1", "405 Method Not Allowed", "text/html", true);
@@ -65,7 +66,8 @@ std::string responce::geterate_responce()
 
 	if (_method == "POST")
 	{
-		return cgi_execute();
+		cgi = cgi_execute();
+		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
 	}
 
 	// check if ask for auto index or return statdard get responce
@@ -76,7 +78,10 @@ std::string responce::geterate_responce()
 		return generate_auto_index(_config.path, _config.url);
 	}
 	if (_config.path.find("?") != std::string::npos)
-		return cgi_execute();
+	{
+		cgi = cgi_execute();
+		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
+	}
 	return generate_get_responce(_config.path, "HTTP/1.1", "200 OK", _current_mime);
 };
 
