@@ -96,6 +96,7 @@ std::vector<std::string>	responce::cgi_env()
 	///SCRIPT_NAME:The virtual path (e.g., /cgi-bin/program.pl ) of the script being executed.
 	if (_header.at("Method:") == "GET")
 		env.push_back("SCRIPT_NAME=" + _config.url.substr(1, _config.url.find("?") - 1));
+	///TO DO SCRIPT NAME with post have a "/" en trop
 	else
 		env.push_back("SCRIPT_NAME=" + _config.url);
 
@@ -169,13 +170,12 @@ char		**responce::vec_to_char(std::vector<std::string> vec_env)
 }
 
 
-void	responce::child_process(int *fd_in, int *fd_out, char **env)
+void	responce::child_process(int *fd, char **env)
 {
 	char *av[3];
 	std::string	tmp = "cgi-bin" + _config.path.substr(_config.path.rfind("/"));
 	if (tmp.find("?") != std::string::npos)
 	{
-		std::cerr << "hey\n" ;
 		tmp.erase(tmp.find("?"));
 	}
 	///TO Do a changer en fonction du langage
@@ -184,62 +184,58 @@ void	responce::child_process(int *fd_in, int *fd_out, char **env)
 	av[0] = (char *)pyth.c_str();
 	av[1] = (char *)tmp.c_str();
 	av[2] = NULL;
-	dup2(fd_in[0], 0);
-	dup2(fd_out[1], 1);
-	close(fd_in[0]);
-	close(fd_in[1]);
-	close(fd_out[0]);
-	close(fd_out[1]);
+	std::cout << "@@@@" << std::endl;
+	std::cout << "AV[0] |" << av[0] << "|" << std::endl;
+	std::cout << "AV[1] |" << av[1] << "|" << std::endl;
+	std::cout << "@@@@" << std::endl;
+	dup2(fd[1], 1);
+	if (_config.method == "POST")
+		write(fd[1], _body.c_str(), _body.size());
+	close(fd[1]);
 	execve(av[0], av, env);
 	///TO DO error if the execve fail
 	std::cerr << "The execve failed" << std::endl;
 	exit(1);
 }
 
-std::string	responce::parent_process(pid_t pid, int *fd_in, int *fd_out)
+std::string	responce::parent_process(pid_t pid, int *fd)
 {
 	int				ret = 1;
 	char			tmp[101] = {0};
 	std::string		str_return;
 
-	dup2(fd_out[0], 0);
-	close(fd_in[0]);
-	close(fd_in[1]);
-	close(fd_out[1]);
-	wait(0);
+	dup2(fd[0], 0);
 	while (ret > 0)
 	{
-		ret = read(fd_out[0], tmp, 100);
+		ret = read(fd[0], tmp, BUFFER_SIZE);
 		tmp[ret] = '\0';
 		str_return += std::string(tmp);
 	}
+	close(fd[0]);
 	std::cout << "ICI : " << str_return << std::endl;
 	return str_return;
 }
 
 std::string	responce::cgi_execute()
 {
-	std::cout << "*****" << std::endl;
-	for (std::map<std::string, std::string>::iterator i = _header.begin(); i != _header.end(); i++)
-		std::cout << i->first << i->second << std::endl;
-	std::cout << _body << std::endl;
-	std::cout << "*****" << std::endl;
 	///TO DO avant il faut vérifier : do it with fstream
 	char	**env = vec_to_char(cgi_env());
-	int		fd_in[2];
-	int		fd_out[2];
+	int		fd[2];
 	pid_t	pid;
+	std::cout << "/////////////" << std::endl;
+	for (size_t i = 0; env[i]; i++)
+		std::cout << "|" << env[i] << "|" << std::endl;
+	std::cout << "/////////////" << std::endl;
 
 	///TO DO mettre une erreur mais je sais pas encore quoi
-	if (pipe(fd_in) == -1)
+	if (pipe(fd) == -1)
 		std::cerr << "CGI : Le pipe du FD_IN a foiré" << std ::endl;
-	if (pipe(fd_out) == -1)
-		std::cerr << "CGI : Le pipe du FD_OUT a foiré" << std ::endl;
 	pid = fork();
 	///TO DO mettre erreur
 	if (pid == -1)
 		std::cerr << "CGI : Le fork il a foiré" << std::endl;
 	else if (pid == 0)
-		child_process(fd_in, fd_out, env);
-	return parent_process(pid, fd_in, fd_out);
+		child_process(fd, env);
+	//waitpid(pid, 0, 0);
+	return parent_process(pid, fd);
 }
