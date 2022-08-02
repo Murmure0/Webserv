@@ -30,7 +30,6 @@ std::map<std::string, std::string>	responce::header_to_map(std::string str)
 
 std::vector<std::string>	responce::cgi_env()
 {
-	std::cout << "config : " << _config.path << std::endl;
 	std::vector<std::string>	env;
 	std::string					tmp;
 	char						tmp_path[PATH_MAX];
@@ -107,7 +106,9 @@ std::vector<std::string>	responce::cgi_env()
 
 	///CONTENT_TYPE
 	if (_header.at("Method:") == "POST")
+	{
 		env.push_back("CONTENT_TYPE=" + _header.at("Content-Type:"));
+	}
 
 	///CONTENT_LENGTH: The length of the query data (in bytes or the number of characters) passed to the CGI program through standard input.
 	if (_header.at("Method:") == "POST")
@@ -184,10 +185,6 @@ void	responce::child_process(int *fd_in, int *fd_out, char **env)
 	av[0] = (char *)pyth.c_str();
 	av[1] = (char *)tmp.c_str();
 	av[2] = NULL;
-	// std::cout << "@@@@" << std::endl;
-	// std::cout << "AV[0] |" << av[0] << "|" << std::endl;
-	// std::cout << "AV[1] |" << av[1] << "|" << std::endl;
-	// std::cout << "@@@@" << std::endl;
 
 	///TO DO error if the execve fail
 	execve(av[0], av, env);
@@ -197,7 +194,7 @@ void	responce::child_process(int *fd_in, int *fd_out, char **env)
 
 std::string	responce::parent_process(pid_t pid, int *fd_in, int *fd_out, int status)
 {
-	char			tmp[101] = {0};
+	char			tmp[BUFFER_SIZE + 1] = {0};
 	std::string		str_return;
 	int ret = 1;
 
@@ -209,12 +206,11 @@ std::string	responce::parent_process(pid_t pid, int *fd_in, int *fd_out, int sta
 	// str_return += std::string(tmp);
 	while (ret > 0)
 	{
-		ret = read(fd_out[0], tmp, 100);
+		ret = read(fd_out[0], tmp, BUFFER_SIZE);
 		tmp[ret] = '\0';
 		str_return += std::string(tmp);
 	}
 	close(fd_out[0]);
-	std::cout << "ICI : " << str_return << std::endl;
 	return str_return;
 }
 
@@ -238,15 +234,11 @@ std::string	responce::cgi_execute()
 
 	else if (pid == 0)
 	{
-		// std::cout << "/////////////" << std::endl;
-		//for (size_t i = 0; env[i]; i++)
-		// std::cout << "|" << env[i] << "|" << std::endl;
-		// std::cout << "/////////////" << std::endl;
 		child_process(fd_in, fd_out, env);
 	}
 
 	dup2(fd_in[0], 0);
-	if (_config.method == "POST")
+	if (_header.at("Method:") == "POST")
 		write(fd_in[1], _body.c_str(), _body.size());
 	//close(fd[0]); Niop
 	close(fd_in[1]);
