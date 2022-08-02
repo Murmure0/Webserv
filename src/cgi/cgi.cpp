@@ -27,18 +27,6 @@ std::map<std::string, std::string>	responce::header_to_map(std::string str)
 	return (map_header);
 }
 
-void	responce::print_the_header()
-{
-	std::cout << "*********************************" << std::endl;
-	for (std::map<std::string, std::string>::iterator i = _header.begin(); i != _header.end(); i++)
-	{
-		std::cout << i->first;
-		std::cout << "|" << i->second << "|" ;
-		std::cout << std::endl;
-	}
-	std::cout << "*********************************" << std::endl;
-}
-
 std::vector<std::string>	responce::cgi_env()
 {
 	std::cout << "config : " << _config.path << std::endl;
@@ -52,10 +40,10 @@ std::vector<std::string>	responce::cgi_env()
 	///access, then the server MUST set the value of this variable from the
 	///'auth-scheme' token in the request Authorization header field.
 	///But in our case we didn't need an authentication so the AUTH_TYPE is empty (RFC3875)
-	env.push_back("AUTH_TYPE=");
+	// env.push_back("AUTH_TYPE=");
 
 	///SERVER_SOFTWARE: The name and version of the server software that is answering the client request.
-	env.push_back("SERVER_SOFTWARE=WEBSERV/1.1");
+	// env.push_back("SERVER_SOFTWARE=WEBSERV/1.1");
 
 	///SERVER_NAME: The server's hostname or IP address.
 	///Because we work in HTTP/1.1 the SERVER_NAME is the host in the requete but there is the PORT after him.
@@ -83,10 +71,10 @@ std::vector<std::string>	responce::cgi_env()
 
 	///PATH_INFO:Extra path information passed to a CGI program.
 	///ATTENTION voir si pas un probleme avec le testeur de l'école mais pour le moment ça suit la RFC
-	if (_header.at("Method:") == "GET")
-		env.push_back("PATH_INFO=" + _config.url.substr(_config.url.find("?") + 1));
-	else
-		env.push_back("PATH_INFO=");
+	// if (_header.at("Method:") == "GET")
+	// 	env.push_back("PATH_INFO=" + _config.url.substr(_config.url.find("?") + 1));
+	// else
+	// 	env.push_back("PATH_INFO=");
 
 	///PATH_TRANSLATE: The translated version of the path given by the variable PATH_INFO.
 	///See with the PATH_INFO and it's just ok when it's a POST
@@ -108,16 +96,17 @@ std::vector<std::string>	responce::cgi_env()
 	///string ("").
 	if (_config.url.find("?") != std::string::npos)
 		env.push_back("QUERY_STRING=" + _config.url.substr(_config.url.find("?") + 1));
-	else
-		env.push_back("QUERY_STRING=" + _body);
+	///TO DO pas de query string lors du post
+	/// else
+	/// 	env.push_back("QUERY_STRING=" + _body);
 
 	///REMOTE_HOST:The hostname from which the user is making the request.
 	///TO DO ve2rification de pourquoi j'ai pas d'argument
-	env.push_back("REMOTE_HOST=");
-
+	// env.push_back("REMOTE_HOST=");
 
 	///CONTENT_TYPE
-	env.push_back("CONTENT_TYPE=" + _current_mime);
+	if (_header.at("Method:") == "POST")
+		env.push_back("CONTENT_TYPE=" + _header.at("Content-Type:"));
 
 	///CONTENT_LENGTH: The length of the query data (in bytes or the number of characters) passed to the CGI program through standard input.
 	if (_header.at("Method:") == "POST")
@@ -170,7 +159,7 @@ char		**responce::vec_to_char(std::vector<std::string> vec_env)
 }
 
 
-void	responce::child_process(int *fd, char **env)
+void	responce::child_process(int *fd, int *fd_body, char **env)
 {
 	char *av[3];
 	std::string	tmp = "cgi-bin" + _config.path.substr(_config.path.rfind("/"));
@@ -184,14 +173,16 @@ void	responce::child_process(int *fd, char **env)
 	av[0] = (char *)pyth.c_str();
 	av[1] = (char *)tmp.c_str();
 	av[2] = NULL;
-	std::cout << "@@@@" << std::endl;
-	std::cout << "AV[0] |" << av[0] << "|" << std::endl;
-	std::cout << "AV[1] |" << av[1] << "|" << std::endl;
-	std::cout << "@@@@" << std::endl;
-	dup2(fd[1], 1);
-	if (_config.method == "POST")
-		write(fd[1], _body.c_str(), _body.size());
+	dup2(fd[1], STDOUT_FILENO);
+	dup2(fd_body[0], STDIN_FILENO);
+	// if (_config.method == "POST")
+	// 	write(fd[1], _body.c_str(), _body.size());
 	close(fd[1]);
+	close(fd[0]);
+	close(fd_body[1]);
+	close(fd_body[0]);
+	for (size_t i = 0; env[i]; i++)
+		std::cout << env[i] << std::endl;
 	execve(av[0], av, env);
 	///TO DO error if the execve fail
 	std::cerr << "The execve failed" << std::endl;
@@ -204,10 +195,9 @@ std::string	responce::parent_process(pid_t pid, int *fd)
 	char			tmp[101] = {0};
 	std::string		str_return;
 
-	dup2(fd[0], 0);
 	while (ret > 0)
 	{
-		ret = read(fd[0], tmp, BUFFER_SIZE);
+		ret = read(fd[0], tmp, 100);
 		tmp[ret] = '\0';
 		str_return += std::string(tmp);
 	}
@@ -218,24 +208,32 @@ std::string	responce::parent_process(pid_t pid, int *fd)
 
 std::string	responce::cgi_execute()
 {
-	///TO DO avant il faut vérifier : do it with fstream
-	char	**env = vec_to_char(cgi_env());
+	std::cout << "BODY :" << _body << std::endl;
+ 	///TO DO avant il faut vérifier : do it with fstream
 	int		fd[2];
+	int		fd_body[2];
 	pid_t	pid;
-	std::cout << "/////////////" << std::endl;
-	for (size_t i = 0; env[i]; i++)
-		std::cout << "|" << env[i] << "|" << std::endl;
-	std::cout << "/////////////" << std::endl;
 
 	///TO DO mettre une erreur mais je sais pas encore quoi
 	if (pipe(fd) == -1)
-		std::cerr << "CGI : Le pipe du FD_IN a foiré" << std ::endl;
+		std::cerr << "CGI : Le pipe du FD a foiré" << std ::endl;
+	if (pipe(fd_body) == -1)
+		std::cerr << "CGI : Le pipe du FD_BODY a foiré" << std ::endl;
 	pid = fork();
 	///TO DO mettre erreur
 	if (pid == -1)
 		std::cerr << "CGI : Le fork il a foiré" << std::endl;
 	else if (pid == 0)
-		child_process(fd, env);
-	//waitpid(pid, 0, 0);
+	{
+		char	**env = vec_to_char(cgi_env());
+		child_process(fd, fd_body, env);
+	}
+	dup2(fd_body[0], STDIN_FILENO);
+	if (_config.method == "POST")
+		write(fd_body[1], _body.c_str(), _body.size());
+	close(fd_body[0]);
+	close(fd_body[1]);
+	close(fd[1]);
+	wait(0);
 	return parent_process(pid, fd);
 }

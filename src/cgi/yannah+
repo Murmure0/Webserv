@@ -1,0 +1,17 @@
+AUTH_TYPE=
+SERVER_SOFTWARE=WEBSERV/1.1
+SERVER_NAME=localhost
+GATEWAY_INTERFACE=CGI/1.1
+SERVER_PROTOCOL=HTTP/1.1
+SERVER_PORT=4041
+REQUEST_METHOD=POST
+PATH_INFO=
+PATH_TRANSLATE=/Users/ybrutout/Desktop/Webserv/website/cgi_test/get.py
+SCRIPT_NAME=/get.py
+REMOTE_HOST=
+CONTENT_TYPE=application/x-www-form-urlencoded
+CONTENT_LENGTH=28
+HTTP_ACCEPT=text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+HTTP_ACCEPT_LANGUAGE=en-US,en;q=0.9
+HTTP_USER_AGENT=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.61 Safari/537.36
+HTTP_REFERER=http://localhost:4041/

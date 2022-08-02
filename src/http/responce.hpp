@@ -45,14 +45,12 @@ private:
 	std::string							cgi_execute();
 	std::vector<std::string>			cgi_env();
 	std::map<std::string, std::string>	header_to_map(std::string str);
-	void								child_process(int *fd, char **env);
+	void								child_process(int *fd, int *fd_body, char **env);
 	std::string							parent_process(pid_t pid, int *fd);
 	char								**vec_to_char(std::vector<std::string> vec_env);
 
 	///essais
 	size_t								_contentlenght;
-	///a enlever
-	void								print_the_header();
 };
 
 #endif // RESPONCE_H
