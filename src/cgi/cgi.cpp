@@ -1,4 +1,5 @@
 #include "../http/responce.hpp"
+#include "sys/wait.h"
 
 /*Fonction utile au CGI car elle permet lors de l'initialisation de la re2ponse, de transformer le header
 de la requete qui est en std::string en map<std::string, std::string>*/
@@ -97,8 +98,8 @@ std::vector<std::string>	responce::cgi_env()
 	if (_header.at("Method:") == "GET")
 		env.push_back("SCRIPT_NAME=" + _config.url.substr(1, _config.url.find("?") - 1));
 	///TO DO SCRIPT NAME with post have a "/" en trop
-	else
-		env.push_back("SCRIPT_NAME=" + _config.url);
+	// else
+	// 	env.push_back("SCRIPT_NAME=" + _config.url);
 
 	///QUERY_STRING: The query information passed to the program.
 	///It is appended to the URL following a question mark (?).
@@ -108,8 +109,8 @@ std::vector<std::string>	responce::cgi_env()
 	///string ("").
 	if (_config.url.find("?") != std::string::npos)
 		env.push_back("QUERY_STRING=" + _config.url.substr(_config.url.find("?") + 1));
-	else
-		env.push_back("QUERY_STRING=" + _body);
+	// else
+	// 	env.push_back("QUERY_STRING=" + _body);
 
 	///REMOTE_HOST:The hostname from which the user is making the request.
 	///TO DO ve2rification de pourquoi j'ai pas d'argument
@@ -170,8 +171,18 @@ char		**responce::vec_to_char(std::vector<std::string> vec_env)
 }
 
 
-void	responce::child_process(int *fd, char **env)
+void	responce::child_process(int *fd_in, char **env, int *fd_out)
 {
+	// dup2(fd_out[0], STDIN_FILENO);
+	// dup2(fd[1], STDOUT_FILENO);
+	dup2(fd_in[0], STDIN_FILENO);
+	dup2(fd_out[1], STDOUT_FILENO);
+	close(fd_in[0]);
+	close(fd_in[1]);
+	close(fd_out[0]);
+	close(fd_out[1]);
+
+
 	char *av[3];
 	std::string	tmp = "cgi-bin" + _config.path.substr(_config.path.rfind("/"));
 	if (tmp.find("?") != std::string::npos)
@@ -184,34 +195,36 @@ void	responce::child_process(int *fd, char **env)
 	av[0] = (char *)pyth.c_str();
 	av[1] = (char *)tmp.c_str();
 	av[2] = NULL;
-	std::cout << "@@@@" << std::endl;
-	std::cout << "AV[0] |" << av[0] << "|" << std::endl;
-	std::cout << "AV[1] |" << av[1] << "|" << std::endl;
-	std::cout << "@@@@" << std::endl;
-	dup2(fd[1], 1);
-	if (_config.method == "POST")
-		write(fd[1], _body.c_str(), _body.size());
-	close(fd[1]);
-	execve(av[0], av, env);
+	// std::cout << "@@@@" << std::endl;
+	// std::cout << "AV[0] |" << av[0] << "|" << std::endl;
+	// std::cout << "AV[1] |" << av[1] << "|" << std::endl;
+	// std::cout << "@@@@" << std::endl;
+
 	///TO DO error if the execve fail
-	std::cerr << "The execve failed" << std::endl;
+	execve(av[0], av, env);
+	//perror("The error post exec is :");
 	exit(1);
 }
 
-std::string	responce::parent_process(pid_t pid, int *fd)
+std::string	responce::parent_process(pid_t pid, int *fd_in, int status, int *fd_out)
 {
-	int				ret = 1;
 	char			tmp[101] = {0};
 	std::string		str_return;
+	int ret = 1;
 
-	dup2(fd[0], 0);
+
+	 waitpid(pid, &status, 0);
+	//wait(0);
+
+	// int	ret = read(fd_out[0], tmp, 100);
+	// str_return += std::string(tmp);
 	while (ret > 0)
 	{
-		ret = read(fd[0], tmp, BUFFER_SIZE);
+		ret = read(fd_out[0], tmp, 100);
 		tmp[ret] = '\0';
 		str_return += std::string(tmp);
 	}
-	close(fd[0]);
+	close(fd_out[0]);
 	std::cout << "ICI : " << str_return << std::endl;
 	return str_return;
 }
@@ -220,22 +233,42 @@ std::string	responce::cgi_execute()
 {
 	///TO DO avant il faut vérifier : do it with fstream
 	char	**env = vec_to_char(cgi_env());
-	int		fd[2];
+	int		fd_in[2]; //body
+	int		fd_out[2]; //family
 	pid_t	pid;
-	std::cout << "/////////////" << std::endl;
-	for (size_t i = 0; env[i]; i++)
-		std::cout << "|" << env[i] << "|" << std::endl;
-	std::cout << "/////////////" << std::endl;
+	int		status;
 
-	///TO DO mettre une erreur mais je sais pas encore quoi
-	if (pipe(fd) == -1)
+	if (pipe(fd_in) == -1)
 		std::cerr << "CGI : Le pipe du FD_IN a foiré" << std ::endl;
+	if(pipe(fd_out) == -1)
+		std::cerr << "CGI : Le pipe du FD_body a foiré" << std ::endl;
+
 	pid = fork();
-	///TO DO mettre erreur
 	if (pid == -1)
 		std::cerr << "CGI : Le fork il a foiré" << std::endl;
+
 	else if (pid == 0)
-		child_process(fd, env);
-	//waitpid(pid, 0, 0);
-	return parent_process(pid, fd);
+	{
+		// std::cout << "/////////////" << std::endl;
+		for (size_t i = 0; env[i]; i++)
+		// std::cout << "|" << env[i] << "|" << std::endl;
+		// std::cout << "/////////////" << std::endl;
+		child_process(fd_in, env, fd_out);
+	}
+
+	dup2(fd_in[0], 0);
+	if (_config.method == "POST")
+		write(fd_in[1], _body.c_str(), _body.size());
+	//close(fd[0]); Niop
+	close(fd_in[1]);
+	close(fd_in[0]);
+
+	//close(fd_out[0]); on va read dessus 
+	close(fd_out[1]);
+
+
+
+
+
+	return parent_process(pid, fd_in, status, fd_out);
 }
