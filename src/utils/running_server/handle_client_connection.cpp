@@ -78,6 +78,7 @@ int webserv::handle_client_connection(void)
 
 				int len = str_resp.size();
 				send((*i).first, (char *)str_resp.c_str(), len, 0);
+				close((*i).first);
 			}
 			for (std::map<int, responce>::iterator i = open_responces.begin(); i != open_responces.end(); i++)
 			{
@@ -103,6 +104,7 @@ int webserv::handle_client_connection(void)
 		{
 			if (FD_ISSET((*i).first, &ready_write_sockets))
 			{
+				/* Scrogneugneu : checker les close & FD_CLEAR pour savoir pouvoir siege s'arrete a cause de socket fermé prematurement*/
 				std::string str_send = (*i).second.geterate_responce();
 				(*i).second.set_responce(str_send);
 
@@ -111,18 +113,20 @@ int webserv::handle_client_connection(void)
 				if(!data_sent.count((*i).first))
 					data_sent[(*i).first] = 0;
 
-				int size = std::min((unsigned long)SEND_BUFFER_SIZE,(str_send.size() - data_sent[(*i).first]));
+				int size = std::min((unsigned long)SEND_BUFFER_SIZE, (str_send.size() - data_sent[(*i).first]));
 
 				int ret = send ((*i).first, (char *)(str_send.c_str() + data_sent[(*i).first]), size, 0); //sending the string begining at (str + data_already_sent)
 				if (ret == -1) // sending error
 				{
+					close((*i).first);
 					open_requests.erase((*i).first);
-					open_responces.erase((*i).first);
 					data_sent[(*i).first] = 0;
+
+					open_responces.erase((*i).first);
 					FD_CLR((*i).first, &current_sockets);
 					FD_CLR((*i).first, &ready_read_sockets);
 					FD_CLR((*i).first, &ready_write_sockets);
-					close((*i).first);
+
 				}
 				else // we've sent something
 				{

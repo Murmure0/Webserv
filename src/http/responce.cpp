@@ -73,6 +73,7 @@ std::string responce::geterate_responce()
 	{
 		cgi = cgi_execute();
 		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
+		//voir quand utilisé le code status 201 Created, qd on a cree un fichier avec POST
 	}
 
 	// check if ask for auto index or return statdard get responce
