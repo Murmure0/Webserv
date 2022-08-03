@@ -4,10 +4,29 @@
 <head>
 	<meta charset="utf-8">
 	<title>simple page</title>
+	<link rel="stylesheet" href="../static/upload.css">
+	<link rel="stylesheet" href="../static/index.css">
 </head>
 
 <body>
-	upload need to do
+	<div class="question_main_div">
+		<div class="qcm_center_div">
+			<h2>Upload file</h2>
+			<div class="drop-zone image_input_div">
+				<span class="drop-zone__prompt">Drop file here or click to upload</span>
+				<form id="form" action="/cgi/upload.py" method="post" enctype="multipart/form-data">
+					<input type="file" name="file1" id="answer" class="drop-zone__input" accept="image/*">
+				</form>
+			</div>
+		</div>
+		<div class="question_nav_div">
+			<div id="next_button" onclick="submit_form()" class="question_nav_elem right">
+				<p>Submit</p>
+			</div>
+		</div>
+	</div>
+
+	<script src="../static/questions.js"></script>
 </body>
 
 </html>

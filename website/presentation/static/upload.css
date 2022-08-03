@@ -1,0 +1,155 @@
+.question_main_div {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-evenly;
+	min-height: 100vh;
+	width: 100%;
+}
+
+.question_main_div form input[type=submit] {
+	position: fixed;
+	bottom: 20;
+	right: 20;
+}
+
+.next_button {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	border: 3px solid var(--divider);
+	background-color: var(--divider);
+	color: var(--text);
+	padding: 2px 6px;
+	border-radius: var(--border_radius);
+	transition: 0.3s;
+}
+
+.next_button p {
+	font-size: 20px;
+	font-weight: bold;
+	color: inherit;
+}
+
+.next_button.active {
+	border: 3px solid var(--primary);
+	background-color: var(--primary);
+	color: var(--on_primary);
+	cursor: pointer;
+}
+
+
+.next_button.active:hover {
+	background-color: var(--background);
+	color: var(--primary);
+}
+
+.question_index {
+	font-size: 18px;
+	color: var(--secondary_text);
+}
+
+.question_index span {
+	color: var(--primary);
+	font-weight: bold;
+}
+
+.question_nav_div {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.question_nav_div .question_nav_elem {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--border_radius);
+	border: 2px solid var(--divider);
+	background-color: var(--background);
+	padding: 6px 12px;
+	margin: 0 20px;
+	transition: 0.3s;
+}
+
+.question_nav_div .question_nav_elem.left p {
+	color: inherit;
+}
+
+.question_nav_div .question_nav_elem.right p {
+	color: inherit;
+}
+
+.question_nav_div .question_nav_elem i {
+	color: inherit;
+}
+
+.question_nav_div .question_nav_elem.active {
+	cursor: pointer;
+}
+
+.question_nav_div .question_nav_elem.active.right {
+	background-color: var(--primary);
+	border-color: var(--primary);
+	color: var(--on_primary);
+}
+
+.question_nav_div .question_nav_elem.active:hover {
+	border-color: var(--primary);
+	background-color: var(--surface);
+	color: var(--primary);
+}
+
+.question_nav_div a {
+	text-decoration: none;
+}
+
+.qcm_center_div {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-width: 500px;
+}
+
+.qcm_center_div h2 {
+	margin-bottom: 20px;
+}
+
+.image_input_div {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	flex-wrap: wrap;
+	justify-content: center;
+	position: relative;
+	min-width: 560px;
+	max-width: 80vw;
+	margin: 0 5%;
+	padding: 5px 10px;
+	border-radius: var(--border_radius);
+	border: 2px dotted var(--primary);
+	background-color: var(--background);
+	cursor: pointer;
+	min-height: 200px;
+}
+
+.image_input_div input {
+	display: none;
+}
+
+.drop-zone__thumb {
+	width: 320px;
+	height: 180px;
+	margin: 10px;
+	border-radius: var(--border_radius);
+	overflow: hidden;
+	background-color: #cccccc;
+	background-size: cover;
+	position: relative;
+}
+
+.drop-zone--over {
+	border-style: solid;
+}

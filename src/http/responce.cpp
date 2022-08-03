@@ -49,7 +49,7 @@ responce &responce::operator=(responce const &rhs)
 
 std::string responce::geterate_responce()
 {
-	std::string	cgi;
+	std::string cgi;
 
 	if (_responce_ready)
 		return _responce;
@@ -83,7 +83,7 @@ std::string responce::geterate_responce()
 			return generate_get_responce("./default_error_pages/404.html", "HTTP/1.1", "404 Not Found", "text/html", true);
 		return generate_auto_index(_config.path, _config.url);
 	}
-	if (_config.path.find("?") != std::string::npos)
+	if (_config.path.find("?") != std::string::npos || _config.path.find(".py") != std::string::npos)
 	{
 		cgi = cgi_execute();
 		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";

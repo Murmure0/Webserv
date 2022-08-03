@@ -22,5 +22,8 @@ else:
 print (f"""
 <html><body>
 <p>{message}</p>
+<a href="/example_pages/page_to_upload.html">Upload an other file</a>
+</br>
+<a href="/">Return home</a>
 </body></html>
 """ )

@@ -1,0 +1,33 @@
+section {
+	width: 100%;
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+
+section h1 {
+	margin-bottom: 20px;
+}
+
+section li {
+	background-color: var(--surface);
+	margin: 5px 0;
+	width: 100%;
+	padding: 5px 15px;
+	border-radius: var(--border_radius);
+	box-shadow: var(--box_shadow);
+	list-style: none;
+	cursor: pointer;
+	font-weight: bold;
+	font-size: 1.2rem;
+	transition: 0.3s;
+	min-width: 200px;
+	text-align: center;
+}
+
+section li:hover {
+	background-color: var(--error);
+	color: var(--on_primary);
+}
