@@ -40,6 +40,8 @@ public:
 
 	bool is_sent(void) const;
 
+	std::string get_response() {return _responce;}
+
 private:
 	std::map<std::string, std::string> *_mime;
 	t_responce_config _config;

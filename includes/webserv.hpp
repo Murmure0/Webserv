@@ -26,7 +26,7 @@
 // #endif
 
 #define BUFFER_SIZE 65536
-#define SEND_BUFFER_SIZE 524288
+#define SEND_BUFFER_SIZE 65536
 
 typedef struct config
 {

@@ -52,7 +52,7 @@ std::string responce::geterate_responce()
 	std::string	cgi;
 
 	if (_responce_ready)
-		return "";
+		return _responce;
 	if (_config.method.find(_method) == std::string::npos)
 	{
 		return generate_get_responce("./default_error_pages/405.html", "HTTP/1.1", "405 Method Not Allowed", "text/html", true);
