@@ -10,7 +10,7 @@ responce::~responce(void)
 {
 }
 
-responce::responce(std::string header, std::string body, std::map<std::string, std::string> *mime, t_responce_config config) : _responce_ready(false), _sent(false)
+responce::responce(std::string header, std::string body, size_t content_size, std::map<std::string, std::string> *mime, t_responce_config config) : _responce_ready(false), _sent(false)
 {
 	_config = config;
 	_mime = mime;
@@ -25,6 +25,9 @@ responce::responce(std::string header, std::string body, std::map<std::string, s
 			_current_mime = std::string("text/html");
 	}
 	_method = header.substr(0, header.find(" "));
+	_header = header_to_map(header);
+	_contentlenght = content_size;
+	_body = body;
 };
 
 responce::responce(responce const &to_copy) : _mime(to_copy._mime), _config(to_copy._config), _current_mime(to_copy._current_mime), _method(to_copy._method), _sent(to_copy._sent) {}
@@ -39,11 +42,15 @@ responce &responce::operator=(responce const &rhs)
 	this->_responce_ready = rhs._responce_ready;
 	this->_responce = rhs._responce;
 	this->_sent = rhs._sent;
+	this->_contentlenght = rhs._contentlenght;
+	this->_body = rhs._body;
 	return *this;
 }
 
 std::string responce::geterate_responce()
 {
+	std::string	cgi;
+
 	if (_responce_ready)
 		return "";
 	if (_config.method.find(_method) == std::string::npos)
@@ -64,7 +71,8 @@ std::string responce::geterate_responce()
 
 	if (_method == "POST")
 	{
-		// post method
+		cgi = cgi_execute();
+		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
 	}
 
 	// check if ask for auto index or return statdard get responce
@@ -73,6 +81,11 @@ std::string responce::geterate_responce()
 		if (!_config.autoindex)
 			return generate_get_responce("./default_error_pages/404.html", "HTTP/1.1", "404 Not Found", "text/html", true);
 		return generate_auto_index(_config.path, _config.url);
+	}
+	if (_config.path.find("?") != std::string::npos)
+	{
+		cgi = cgi_execute();
+		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
 	}
 	return generate_get_responce(_config.path, "HTTP/1.1", "200 OK", _current_mime);
 };

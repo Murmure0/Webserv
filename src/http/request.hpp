@@ -13,7 +13,7 @@ public:
 	request &operator=(request const &rhs);
 
 	void config_content_size(std::string header);
-	
+
 	/*
 	this function will fill the request object by reading BUFFER_SIZE by BUFFER_SIZE char on specific fd
 	*/
@@ -32,6 +32,8 @@ public:
 	get asked ressources
 	*/
 	std::string get_path(void) const;
+
+	size_t		get_content_size(void) const;
 
 private:
 	std::string _header, _body;
