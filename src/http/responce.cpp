@@ -118,6 +118,7 @@ std::string responce::generate_auto_index(std::string path, std::string url) con
 
 std::string responce::generate_get_responce(std::string path, std::string http_version, std::string status, std::string mime, bool not_fail) const
 {
+	(void)mime;
 	std::ifstream infile(path.c_str());
 
 	if (!not_fail && !infile.good())
@@ -127,7 +128,6 @@ std::string responce::generate_get_responce(std::string path, std::string http_v
 
 	std::stringstream ss;
 	std::string str_resp;
-	const char *str_tmp2;
 
 	ss << infile.rdbuf();
 

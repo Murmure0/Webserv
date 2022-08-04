@@ -154,8 +154,8 @@ int webserv::handle_client_connection(void)
 				if ((*i).second.is_sent())
 				{
 					open_responces.erase(i);
-					close((*i).first);
-					FD_CLR((*i).first, &current_sockets);
+					//close((*i).first);
+					//FD_CLR((*i).first, &current_sockets);
 					break;
 				}
 			}

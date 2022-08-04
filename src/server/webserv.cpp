@@ -373,10 +373,17 @@ webserv::~webserv(void)
 	mime.clear();
 }
 
-webserv::webserv(webserv const &to_copy) {}
+webserv::webserv(webserv const &to_copy) {
+	(void)to_copy;
+	// this->servers = to_copy.servers;
+	// this->servers_name_to_server = to_copy.servers_name_to_server;
+	// this->_listen_sockets = to_copy._listen_sockets;
+	// this->mime = to_copy.mime;
+}
 
 webserv &webserv::operator=(webserv const &rhs)
 {
+	(void)rhs;
 	return *this;
 }
 
@@ -531,14 +538,14 @@ t_responce_config webserv::generate_config(std::string host, std::string path, s
 	{
 		config.path = complete_url(config.path, config.index);
 	}
-	if (loc)
-	{
-		std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | loc: " << loc->get_location_match() << " | " << config.path << " | " << config.method << std::endl;
-	}
-	else
-	{
-		// std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | alone | " << config.path << std::endl;
-	}
+	// if (loc)
+	// {
+	// 	//std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | loc: " << loc->get_location_match() << " | " << config.path << " | " << config.method << std::endl;
+	// }
+	// else
+	// {
+	// 	// std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | alone | " << config.path << std::endl;
+	// }
 	config.header = header;
 	return config;
 }
