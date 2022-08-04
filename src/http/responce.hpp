@@ -8,7 +8,7 @@ class responce
 {
 public:
 	responce(void);
-	responce(std::string header, std::string body, size_t content_size, std::map<std::string, std::string> *mime, t_responce_config config);
+	responce(std::string header, std::string body, std::string addr, size_t content_size, std::map<std::string, std::string> *mime, t_responce_config config);
 	~responce(void);
 	responce(responce const &copy);
 	responce &operator=(responce const &rhs);
@@ -52,6 +52,7 @@ private:
 	bool _sent;
 	std::string	_body;
 	std::map<std::string, std::string>	_header;
+	std::string							_addr_ip;
 
 	std::string							cgi_execute();
 	std::vector<std::string>			cgi_env();

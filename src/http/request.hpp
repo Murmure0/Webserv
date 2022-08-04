@@ -9,6 +9,7 @@ class request
 public:
 	request(void);
 	~request(void);
+	request(std::string addr);
 	request(request const &copy);
 	request &operator=(request const &rhs);
 
@@ -21,6 +22,7 @@ public:
 	bool is_completed(void) const;
 	std::string get_header(void) const;
 	std::string get_body(void) const;
+	std::string	get_addr_ip(void) const;
 
 	/*
 	get string between host: and the next space
@@ -37,6 +39,7 @@ public:
 
 private:
 	std::string _header, _body;
+	std::string	_addr_ip;
 	size_t _content_size;
 	bool _header_completed;
 	bool _request_completed;

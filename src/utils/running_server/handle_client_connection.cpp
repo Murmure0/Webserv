@@ -3,6 +3,7 @@
 
 int webserv::accept_new_connection(int server_fd, sockaddr_in sockaddr)
 {
+	char   buff[16];
 	unsigned long addrlen = sizeof(sockaddr);
 	int connection = accept(server_fd, (struct sockaddr *)&sockaddr, (socklen_t *)&addrlen);
 	if (connection < 0)
@@ -10,6 +11,9 @@ int webserv::accept_new_connection(int server_fd, sockaddr_in sockaddr)
 		std::cout << "Failed to grab connection." << std::endl;
 		return -1;
 	}
+
+    inet_ntop(AF_INET, &(sockaddr.sin_addr.s_addr), buff, INET_ADDRSTRLEN);
+	_addr_ip = (std::string)buff;
 	return connection;
 }
 
@@ -169,7 +173,7 @@ int webserv::handle_client_connection(void)
 				(*i).second.read_and_append((*i).first);
 				if ((*i).second.is_completed())
 				{
-					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(), (*i).second.get_content_size(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path(), (*i).second.get_header()));
+					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(),(*i).second.get_addr_ip(), (*i).second.get_content_size(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path(), (*i).second.get_header()));
 					FD_CLR((*i).first, &current_sockets);
 					open_requests.erase(i);
 					break;
@@ -184,7 +188,7 @@ int webserv::handle_client_connection(void)
 			if (FD_ISSET((*i).get_fd(), &ready_read_sockets))
 			{
 				int client_socket = accept_new_connection((*i).get_fd(), (*i).get_addr());
-				open_requests[client_socket] = request();
+				open_requests[client_socket] = request(this->_addr_ip);
 				FD_SET(client_socket, &current_sockets);
 			}
 		}

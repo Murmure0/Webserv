@@ -24,7 +24,7 @@ public:
 	/* Used in run : */
 	static int setup_server(int port, int backlog, sockaddr_in sockaddr);
 	int handle_client_connection(void);
-	static int accept_new_connection(int server_fd, sockaddr_in sockaddr);
+	int accept_new_connection(int server_fd, sockaddr_in sockaddr);
 
 	/*
 	this function will generate the config structure used by the responce class
@@ -36,7 +36,8 @@ private:
 	std::map<std::string, server> servers;
 	std::map<std::string, std::string> servers_name_to_server;
 	std::vector<listen_socket> _listen_sockets;
-	std::map<std::string, std::string> mime;
+	std::map<std::string, std::string>	mime;
+	std::string							_addr_ip;
 };
 
 #endif // WEBSERV_H

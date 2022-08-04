@@ -10,7 +10,7 @@ responce::~responce(void)
 {
 }
 
-responce::responce(std::string header, std::string body, size_t content_size, std::map<std::string, std::string> *mime, t_responce_config config) : _responce_ready(false), _sent(false)
+responce::responce(std::string header, std::string body, std::string addr, size_t content_size, std::map<std::string, std::string> *mime, t_responce_config config) : _responce_ready(false), _sent(false)
 {
 	_config = config;
 	_mime = mime;
@@ -28,6 +28,7 @@ responce::responce(std::string header, std::string body, size_t content_size, st
 	_header = header_to_map(header);
 	_contentlenght = content_size;
 	_body = body;
+	_addr_ip = addr;
 };
 
 responce::responce(responce const &to_copy) : _mime(to_copy._mime), _config(to_copy._config), _current_mime(to_copy._current_mime), _method(to_copy._method), _sent(to_copy._sent) {}
@@ -44,6 +45,7 @@ responce &responce::operator=(responce const &rhs)
 	this->_sent = rhs._sent;
 	this->_contentlenght = rhs._contentlenght;
 	this->_body = rhs._body;
+	this->_addr_ip = rhs._addr_ip;
 	return *this;
 }
 
@@ -142,6 +144,8 @@ std::string responce::generate_get_responce(std::string path, std::string http_v
 	infile.close();
 	return str_resp;
 }
+
+
 
 void responce::set_responce(std::string responce)
 {

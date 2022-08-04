@@ -33,7 +33,7 @@ std::vector<std::string>	responce::cgi_env()
 	std::vector<std::string>	env;
 	std::string					tmp;
 	char						tmp_path[PATH_MAX];
-	
+
 	///AUTH_TYPE:The authentication method used to validate a user.
 	env.push_back("AUTH_TYPE=");
 
@@ -107,6 +107,9 @@ std::vector<std::string>	responce::cgi_env()
 
 	///HTTP_REFERER:The URL of the document the client points to before accessing the CGI program.
 	env.push_back("HTTP_REFERER=" + _header.at("Referer:"));
+
+	///REMOTE_ADDR: TO DO explication
+	env.push_back("REMOTE_ADDR=" + _addr_ip);
 
 	for (std::vector<std::string>::iterator i = env.begin(); i != env.end(); i++)
 		std::cout << *i << std::endl;

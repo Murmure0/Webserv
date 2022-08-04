@@ -5,6 +5,11 @@ request::request(void) : _content_size(-1), _header_completed(false), _request_c
 {
 }
 
+request::request(std::string addr) : _content_size(-1), _header_completed(false), _request_completed(false)
+{
+	_addr_ip = addr;
+}
+
 request::~request(void)
 {
 }
@@ -13,7 +18,7 @@ request::request(request const &to_copy) : _content_size(to_copy._content_size),
 
 request &request::operator=(request const &rhs)
 {
-	(void)rhs;
+	this->_addr_ip = rhs._addr_ip;
 	return *this;
 }
 
@@ -99,4 +104,9 @@ std::string request::get_path(void) const
 size_t		request::get_content_size(void) const
 {
 	return this->_content_size;
+}
+
+std::string	request::get_addr_ip(void) const
+{
+	return this->_addr_ip;
 }
