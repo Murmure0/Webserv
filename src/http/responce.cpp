@@ -72,6 +72,8 @@ std::string responce::geterate_responce()
 	if (_method == "POST")
 	{
 		cgi = cgi_execute();
+		if (cgi.empty())
+			return generate_get_responce("./default_error_pages/500.html", "HTTP/1.1", "500 Internal Server Error", "text/html", true);
 		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
 		//voir quand utilisé le code status 201 Created, qd on a cree un fichier avec POST
 	}
@@ -86,6 +88,8 @@ std::string responce::geterate_responce()
 	if (_config.path.find("?") != std::string::npos || _config.path.find(".py") != std::string::npos)
 	{
 		cgi = cgi_execute();
+		if (cgi.empty())
+			return generate_get_responce("./default_error_pages/500.html", "HTTP/1.1", "500 Internal Server Error", "text/html", true);
 		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
 	}
 	return generate_get_responce(_config.path, "HTTP/1.1", "200 OK", _current_mime);

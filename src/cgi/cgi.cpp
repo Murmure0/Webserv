@@ -159,15 +159,14 @@ char		**responce::vec_to_char(std::vector<std::string> vec_env)
 
 void	responce::child_process(int *fd_in, int *fd_out, char **env)
 {
-	// dup2(fd_out[0], STDIN_FILENO);
-	// dup2(fd[1], STDOUT_FILENO);
-	dup2(fd_in[0], STDIN_FILENO);
-	dup2(fd_out[1], STDOUT_FILENO);
+	if (dup2(fd_in[0], STDIN_FILENO) == -1)
+		exit(1);
+	if (dup2(fd_out[1], STDOUT_FILENO) == -1)
+		exit(1);
 	close(fd_in[0]);
 	close(fd_in[1]);
 	close(fd_out[0]);
 	close(fd_out[1]);
-
 
 	char *av[3];
 	std::string	tmp = "cgi-bin" + _config.path.substr(_config.path.rfind("/"));
@@ -182,9 +181,8 @@ void	responce::child_process(int *fd_in, int *fd_out, char **env)
 	av[1] = (char *)tmp.c_str();
 	av[2] = NULL;
 
-	///TO DO error if the execve fail
 	execve(av[0], av, env);
-	//perror("The error post exec is :");
+
 	exit(1);
 }
 
@@ -214,18 +212,19 @@ std::string	responce::cgi_execute()
 	int		status = 0;
 
 	if (pipe(fd_in) == -1)
-		std::cerr << "CGI : Le pipe du FD_IN a foiré" << std ::endl;
+		return "";
 	if(pipe(fd_out) == -1)
-		std::cerr << "CGI : Le pipe du FD_body a foiré" << std ::endl;
+		return "";
 	pid = fork();
 	if (pid == -1)
-		std::cerr << "CGI : Le fork il a foiré" << std::endl;
+		return "";
 
 	else if (pid == 0)
 	{
 		child_process(fd_in, fd_out, env);
 	}
-	dup2(fd_in[0], 0);
+	if (dup2(fd_in[0], 0) == -1)
+		return "";
 	if (_header.at("Method:") == "POST")
 		write(fd_in[1], _body.c_str(), _body.size());
 	close(fd_in[1]);
