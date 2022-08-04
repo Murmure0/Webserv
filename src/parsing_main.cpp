@@ -18,19 +18,15 @@ void signal_handler(int signal_handle)
 
 int main(int argc, char **argv)
 {
-
-	if (argc != 2)
-	{
-		std::cout << "Don't forget the config file" << std::endl;
-		return 0;
-	}
-
 	webserv ws;
 	send_ws(&ws);
 	std::signal(SIGINT, signal_handler);
 	try
 	{
-		ws.config(argv[1]);
+		if (argc != 2)
+			ws.config("src/config/config_file.conf");
+		else
+			ws.config(argv[1]);
 	}
 	catch (listen_socket::ServerInitFailed &e)
 	{
