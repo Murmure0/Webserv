@@ -36,14 +36,10 @@ std::vector<std::string>	responce::cgi_env()
 	/*-----------------------------------SERVER_INFORMATION-------------------------------------------------*/
 
 	///AUTH_TYPE:The authentication method used to validate a user.
-	///For HTTP, if the client request required authentication for external
-	///access, then the server MUST set the value of this variable from the
-	///'auth-scheme' token in the request Authorization header field.
-	///But in our case we didn't need an authentication so the AUTH_TYPE is empty (RFC3875)
-	// env.push_back("AUTH_TYPE=");
+	env.push_back("AUTH_TYPE=");
 
 	///SERVER_SOFTWARE: The name and version of the server software that is answering the client request.
-	// env.push_back("SERVER_SOFTWARE=WEBSERV/1.1");
+	env.push_back("SERVER_SOFTWARE=WEBSERV/1.1");
 
 	///SERVER_NAME: The server's hostname or IP address.
 	///Because we work in HTTP/1.1 the SERVER_NAME is the host in the requete but there is the PORT after him.
@@ -71,10 +67,10 @@ std::vector<std::string>	responce::cgi_env()
 
 	///PATH_INFO:Extra path information passed to a CGI program.
 	///ATTENTION voir si pas un probleme avec le testeur de l'école mais pour le moment ça suit la RFC
-	// if (_header.at("Method:") == "GET")
-	// 	env.push_back("PATH_INFO=" + _config.url.substr(_config.url.find("?") + 1));
-	// else
-	// 	env.push_back("PATH_INFO=");
+	if (_header.at("Method:") == "GET")
+		env.push_back("PATH_INFO=" + _config.url.substr(_config.url.find("?") + 1));
+	else
+		env.push_back("PATH_INFO=");
 
 	///PATH_TRANSLATE: The translated version of the path given by the variable PATH_INFO.
 	///See with the PATH_INFO and it's just ok when it's a POST
@@ -85,8 +81,8 @@ std::vector<std::string>	responce::cgi_env()
 	if (_header.at("Method:") == "GET")
 		env.push_back("SCRIPT_NAME=" + _config.url.substr(1, _config.url.find("?") - 1));
 	///TO DO SCRIPT NAME with post have a "/" en trop
-	// else
-	// 	env.push_back("SCRIPT_NAME=" + _config.url);
+	else
+		env.push_back("SCRIPT_NAME=" + _config.url);
 
 	///QUERY_STRING: The query information passed to the program.
 	///It is appended to the URL following a question mark (?).
@@ -102,7 +98,7 @@ std::vector<std::string>	responce::cgi_env()
 
 	///REMOTE_HOST:The hostname from which the user is making the request.
 	///TO DO ve2rification de pourquoi j'ai pas d'argument
-	// env.push_back("REMOTE_HOST=");
+	env.push_back("REMOTE_HOST=");
 
 	///CONTENT_TYPE
 	if (_header.at("Method:") == "POST")
@@ -227,7 +223,6 @@ std::string	responce::cgi_execute()
 		std::cerr << "CGI : Le pipe du FD_IN a foiré" << std ::endl;
 	if(pipe(fd_out) == -1)
 		std::cerr << "CGI : Le pipe du FD_body a foiré" << std ::endl;
-
 	pid = fork();
 	if (pid == -1)
 		std::cerr << "CGI : Le fork il a foiré" << std::endl;
