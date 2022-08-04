@@ -13,6 +13,7 @@ request::request(request const &to_copy) : _content_size(to_copy._content_size),
 
 request &request::operator=(request const &rhs)
 {
+	(void)rhs;
 	return *this;
 }
 

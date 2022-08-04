@@ -24,7 +24,7 @@ listen_socket::listen_socket(int port) : _port(port)
 	_addr.sin_addr.s_addr = INADDR_ANY;
 	_addr.sin_port = htons(port);
 
-	int backlog = 10;
+	int backlog = 100;
 
 	/* Allow tu reuse socket previously bind */
 	const int enable = 1;

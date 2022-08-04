@@ -104,60 +104,60 @@ int webserv::handle_client_connection(void)
 		{
 			if (FD_ISSET((*i).first, &ready_write_sockets))
 			{
-				std::string str_send = (*i).second.geterate_responce();
-				(*i).second.set_responce(str_send);
+				// std::string str_send = (*i).second.geterate_responce();
+				// (*i).second.set_responce(str_send);
 
-				static std::map<int, size_t> data_sent; // map <fd_client, qty_data_already_sent> data_sent
+				// static std::map<int, size_t> data_sent; // map <fd_client, qty_data_already_sent> data_sent
 
-				if(!data_sent.count((*i).first))
-					data_sent[(*i).first] = 0;
+				// if(!data_sent.count((*i).first))
+				// 	data_sent[(*i).first] = 0;
 
-				int size = std::min((unsigned long)SEND_BUFFER_SIZE,(str_send.size() - data_sent[(*i).first]));
+				// int size = std::min((unsigned long)SEND_BUFFER_SIZE,(str_send.size() - data_sent[(*i).first]));
 
-				int ret = send ((*i).first, (char *)(str_send.c_str() + data_sent[(*i).first]), size, 0); //sending the string begining at (str + data_already_sent)
-				if (ret == -1) // sending error
-				{
-					open_requests.erase((*i).first);
-					open_responces.erase((*i).first);
-					data_sent[(*i).first] = 0;
-					FD_CLR((*i).first, &current_sockets);
-					FD_CLR((*i).first, &ready_read_sockets);
-					FD_CLR((*i).first, &ready_write_sockets);
-					close((*i).first);
-				}
-				else // we've sent something
-				{
-					data_sent[(*i).first] += ret; // Increasing data_already_sent
-					if (data_sent[(*i).first] >= str_send.size()) // we've finished to sent the body to the buddy
-					{
-						data_sent[(*i).first] = 0;
-						open_requests.erase((*i).first); // NEED REVIEW : not sure which socket FD_CLR &  what to erase
-						open_responces.erase((*i).first);
-					}
-				}
-				ret = 0;
-				break;
-
-				// /* first method :*/
-				// // // save in the responce. Once save don't call anymore
-				// std::string str_resp = (*i).second.geterate_responce();
-				// (*i).second.set_responce(str_resp);
-
-				// str_resp = (*i).second.cuted_responce();
-				// int len = str_resp.size();
-
-				// // sending to client :
-				// // call new function in responce to get BUFFERSIZE each time
-				// send((*i).first, str_resp.c_str(), len, 0);
-
-				// // erase responce
-				// if ((*i).second.is_sent())
+				// int ret = send ((*i).first, (char *)(str_send.c_str() + data_sent[(*i).first]), size, 0); //sending the string begining at (str + data_already_sent)
+				// if (ret == -1) // sending error
 				// {
-				// 	open_responces.erase(i);
-				// 	close((*i).first);
+				// 	open_requests.erase((*i).first);
+				// 	open_responces.erase((*i).first);
+				// 	data_sent[(*i).first] = 0;
 				// 	FD_CLR((*i).first, &current_sockets);
-				// 	break;
+				// 	FD_CLR((*i).first, &ready_read_sockets);
+				// 	FD_CLR((*i).first, &ready_write_sockets);
+				// 	close((*i).first);
 				// }
+				// else // we've sent something
+				// {
+				// 	data_sent[(*i).first] += ret; // Increasing data_already_sent
+				// 	if (data_sent[(*i).first] >= str_send.size()) // we've finished to sent the body to the buddy
+				// 	{
+				// 		data_sent[(*i).first] = 0;
+				// 		open_requests.erase((*i).first); // NEED REVIEW : not sure which socket FD_CLR &  what to erase
+				// 		open_responces.erase((*i).first);
+				// 	}
+				// }
+				// ret = 0;
+				// break;
+
+				/* first method :*/
+				// // save in the responce. Once save don't call anymore
+				std::string str_resp = (*i).second.geterate_responce();
+				(*i).second.set_responce(str_resp);
+
+				str_resp = (*i).second.cuted_responce();
+				int len = str_resp.size();
+
+				// sending to client :
+				// call new function in responce to get BUFFERSIZE each time
+				send((*i).first, str_resp.c_str(), len, 0);
+
+				// erase responce
+				if ((*i).second.is_sent())
+				{
+					open_responces.erase(i);
+					//close((*i).first);
+					//FD_CLR((*i).first, &current_sockets);
+					break;
+				}
 			}
 		}
 

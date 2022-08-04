@@ -57,7 +57,7 @@ private:
 	std::vector<std::string>			cgi_env();
 	std::map<std::string, std::string>	header_to_map(std::string str);
 	void								child_process(int *fd_in, int *fd_out, char **env);
-	std::string							parent_process(pid_t pid, int *fd_in, int *fd_out, int status);
+	std::string							parent_process(pid_t pid, int *fd_out, int status);
 	char								**vec_to_char(std::vector<std::string> vec_env);
 
 	///essais

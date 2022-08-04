@@ -192,18 +192,13 @@ void	responce::child_process(int *fd_in, int *fd_out, char **env)
 	exit(1);
 }
 
-std::string	responce::parent_process(pid_t pid, int *fd_in, int *fd_out, int status)
+std::string	responce::parent_process(pid_t pid, int *fd_out, int status)
 {
 	char			tmp[BUFFER_SIZE + 1] = {0};
 	std::string		str_return;
-	int ret = 1;
+	int				ret = 1;
 
-
-	 waitpid(pid, &status, 0);
-	//wait(0);
-
-	// int	ret = read(fd_out[0], tmp, 100);
-	// str_return += std::string(tmp);
+	waitpid(pid, &status, 0);
 	while (ret > 0)
 	{
 		ret = read(fd_out[0], tmp, BUFFER_SIZE);
@@ -216,12 +211,11 @@ std::string	responce::parent_process(pid_t pid, int *fd_in, int *fd_out, int sta
 
 std::string	responce::cgi_execute()
 {
-	///TO DO avant il faut vérifier : do it with fstream
 	char	**env = vec_to_char(cgi_env());
 	int		fd_in[2]; //body
 	int		fd_out[2]; //family
 	pid_t	pid;
-	int		status;
+	int		status = 0;
 
 	if (pipe(fd_in) == -1)
 		std::cerr << "CGI : Le pipe du FD_IN a foiré" << std ::endl;
@@ -236,20 +230,14 @@ std::string	responce::cgi_execute()
 	{
 		child_process(fd_in, fd_out, env);
 	}
-
 	dup2(fd_in[0], 0);
 	if (_header.at("Method:") == "POST")
 		write(fd_in[1], _body.c_str(), _body.size());
-	//close(fd[0]); Niop
 	close(fd_in[1]);
 	close(fd_in[0]);
 
 	//close(fd_out[0]); on va read dessus
 	close(fd_out[1]);
 
-
-
-
-
-	return parent_process(pid, fd_in, fd_out, status);
+	return parent_process(pid, fd_out, status);
 }
