@@ -3,7 +3,8 @@
 
 int webserv::accept_new_connection(int server_fd, sockaddr_in sockaddr)
 {
-	char   buff[16];
+	char	buff[16];
+	char	buff_b[30];
 	unsigned long addrlen = sizeof(sockaddr);
 	int connection = accept(server_fd, (struct sockaddr *)&sockaddr, (socklen_t *)&addrlen);
 	if (connection < 0)
@@ -13,7 +14,13 @@ int webserv::accept_new_connection(int server_fd, sockaddr_in sockaddr)
 	}
 
     inet_ntop(AF_INET, &(sockaddr.sin_addr.s_addr), buff, INET_ADDRSTRLEN);
-	_addr_ip = (std::string)buff;
+	if (!buff[0])
+	{
+		inet_ntop(AF_INET6, &(sockaddr.sin_addr.s_addr), buff_b, INET6_ADDRSTRLEN);
+		_addr_ip = (std::string)buff_b;
+	}
+	else
+		_addr_ip = (std::string)buff;
 	return connection;
 }
 
