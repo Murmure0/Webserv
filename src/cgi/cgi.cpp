@@ -34,27 +34,20 @@ std::vector<std::string>	responce::cgi_env()
 	std::string					tmp;
 	char						tmp_path[PATH_MAX];
 
-	///AUTH_TYPE:The authentication method used to validate a user.
 	env.push_back("AUTH_TYPE=");
 
-	///SERVER_SOFTWARE: The name and version of the server software that is answering the client request.
 	env.push_back("SERVER_SOFTWARE=WEBSERV/1.1");
 
-	///SERVER_NAME: The server's hostname or IP address.
 	tmp = _header.find("Host:")->second;
 	env.push_back("SERVER_NAME=" + tmp.substr(0, tmp.find(":")));
 
-	///GATEWAY_INTERFACE:The revision of the Common Gateway Interface the server uses.
 	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
 
-	///SERVER_PROTOCOL:The name and revision of the information protocol the request came in with.
 	env.push_back("SERVER_PROTOCOL=HTTP/1.1");
 
-	///SERVER_PORT: The port number of the host on which the server is running.
 	env.push_back("SERVER_PORT=" + tmp.substr(tmp.find(":")+1));
 
-	///REQUEST_METHOD:The method with which the information request was issued (e.g., GET, POST, HEAD).
-	env.push_back("REQUEST_METHOD=" + _header.at("Method:"));//probleme car pour le moment je renvoie la methid de la config
+	env.push_back("REQUEST_METHOD=" + _header.at("Method:"));
 
 	///PATH_INFO:Extra path information passed to a CGI program.
 	///TO DO voir si pas un probleme avec le testeur de l'école mais pour le moment ça suit la RFC
@@ -63,56 +56,46 @@ std::vector<std::string>	responce::cgi_env()
 	else
 		env.push_back("PATH_INFO=");
 
-	///PATH_TRANSLATE: The translated version of the path given by the variable PATH_INFO.
 	getcwd(tmp_path, PATH_MAX);
 	env.push_back(std::string ("PATH_TRANSLATE=") + tmp_path + "/" + _config.path.substr(2));
 
-	///SCRIPT_NAME:The virtual path (e.g., /cgi-bin/program.pl ) of the script being executed.
 	if (_header.at("Method:") == "GET")
-		env.push_back("SCRIPT_NAME=" + _config.url.substr(1, _config.url.find("?") - 1));
+		env.push_back("SCRIPT_NAME=" + _config.url.substr(0, _config.url.find("?")));
 	else
-		env.push_back("SCRIPT_NAME=" + _config.url.substr(1));
+		env.push_back("SCRIPT_NAME=" + _config.url.substr(0));
 
-	///QUERY_STRING: The query information passed to the program.
 	if (_config.url.find("?") != std::string::npos)
 		env.push_back("QUERY_STRING=" + _config.url.substr(_config.url.find("?") + 1));
 
-	///REMOTE_HOST:The hostname from which the user is making the request.
 	env.push_back("REMOTE_HOST=");
 
-	///CONTENT_TYPE
 	if (_header.at("Method:") == "POST")
-	{
 		env.push_back("CONTENT_TYPE=" + _header.at("Content-Type:"));
-	}
 
-	///CONTENT_LENGTH: The length of the query data (in bytes or the number of characters) passed to the CGI program through standard input.
 	if (_header.at("Method:") == "POST")
-	{
 		env.push_back("CONTENT_LENGTH=" + ft_to_string(_contentlenght));
-	}
 	else
 		env.push_back("CONTENT_LENGTH=");
 
-	///HTTP_ACCEPT:A list of the media types the client can accept.
 	env.push_back("HTTP_ACCEPT=" + _header.at("Accept:"));
 
 
-	///HTTP_ACCEPT_LANGUAGE:A list of the language the client can accept(understand).
 	env.push_back("HTTP_ACCEPT_LANGUAGE=" + _header.at("Accept-Language:"));
 
-	///HTTP_USER_AGENT:The User-Agent request-header field contains information about the user agent
-	///originating the request. It is a name of the web browser.
 	env.push_back("HTTP_USER_AGENT=" + _header.at("User-Agent:"));
 
-	///HTTP_REFERER:The URL of the document the client points to before accessing the CGI program.
 	env.push_back("HTTP_REFERER=" + _header.at("Referer:"));
 
-	///REMOTE_ADDR: TO DO explication
 	env.push_back("REMOTE_ADDR=" + _addr_ip);
 
-	for (std::vector<std::string>::iterator i = env.begin(); i != env.end(); i++)
-		std::cout << *i << std::endl;
+	env.push_back("REMOTE_IDENT=");
+
+	env.push_back("REMOTE_USER=");
+
+
+	if (_header.find("Cookie:") != _header.end())
+		env.push_back("HTTP_COOKIE=" + _header.at("Cookie:"));
+
 	return env;
 }
 
@@ -165,7 +148,7 @@ void	responce::child_process(int *fd_in, int *fd_out, char **env)
 	{
 		tmp.erase(tmp.find("?"));
 	}
-	///For The moment we manage the python/php and pearl langage
+	///For The moment we manage the python/php/pearl langage
 	std::string shebang_line = find_the_shebang_line(tmp);
 
 	av[0] = (char *)shebang_line.c_str();
@@ -220,8 +203,6 @@ std::string	responce::cgi_execute()
 		write(fd_in[1], _body.c_str(), _body.size());
 	close(fd_in[1]);
 	close(fd_in[0]);
-
-	//close(fd_out[0]); on va read dessus
 	close(fd_out[1]);
 
 	return parent_process(pid, fd_out, status);
