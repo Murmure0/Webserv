@@ -465,7 +465,7 @@ void webserv::config(std::string config_file)
 				pair.first = pair.second.get_id() + "_" + ft_to_string((*port_count.find(atoi(pair.second.get_id().c_str()))).second);
 			}
 			servers.insert(pair);
-			std::string server_names = pair.second.get_server_name().c_str();
+			std::string server_names = pair.second.get_server_name();
 			while (!server_names.empty())
 			{
 				std::string key = server_names.substr(0, server_names.find(" ")) + ":" + pair.second.get_id();
@@ -483,9 +483,16 @@ void webserv::config(std::string config_file)
 	}
 }
 
+void webserv::check_error(std::string reason)
+{
+	std::cout << "config error: " << reason << std::endl;
+	throw BadConfig();
+}
+
 void webserv::check_config(std::string config_file)
 {
 	std::string s = file_to_string(config_file);
+	std::string serv_name;
 	t_config m_c;
 	t_config s_c;
 	t_config l_c;
@@ -494,13 +501,20 @@ void webserv::check_config(std::string config_file)
 	bool s_i = true;
 	bool l_i = true;
 
+	if (s.empty())
+		check_error("bad configuration file");
+	if (trim(s, "\n ").empty())
+		check_error("empty configuration file");
+
 	while (!m_c.key.empty() || m_i)
 	{
 		m_i = false;
 		m_c = get_next_variable(s);
 		if (m_c.key == "server")
 		{
-			std::pair<std::string, server> pair;
+			server serv;
+			if (trim(m_c.value, " \n\t").empty())
+				check_error("empty server");
 			while (!s_c.key.empty() || s_i)
 			{
 				s_i = false;
@@ -508,30 +522,45 @@ void webserv::check_config(std::string config_file)
 
 				if (s_c.key == "location")
 				{
-					std::pair<std::string, location> l_pair;
-					l_pair.first = s_c.before_braquet;
-					l_pair.second.set("location_match", s_c.before_braquet);
+					location loc;
+					if (s_c.before_braquet.empty())
+						check_error("location need location match");
+					loc.set("location_match", s_c.before_braquet);
+					if (trim(s_c.value, " \n").empty())
+						check_error("empty location");
 					while (!l_c.key.empty() || l_i)
 					{
 						l_i = false;
 						l_c = get_next_variable(s_c.value);
-						l_pair.second.set(l_c.key, l_c.value);
+						loc.set(l_c.key, l_c.value);
 						if (s_c.value.length() > l_c.next_start)
 							s_c.value = s_c.value.substr(l_c.next_start);
 						else
 							break;
 					}
-					pair.second.add_location(l_pair);
 				}
 				else
 				{
-					pair.second.set(s_c.key, s_c.value);
+					serv.set(s_c.key, s_c.value);
 				}
 				if (m_c.value.length() > s_c.next_start)
 					m_c.value = m_c.value.substr(s_c.next_start);
 				else
 					break;
 			}
+			std::string server_names = serv.get_server_name();
+			while (!server_names.empty())
+			{
+				std::string key = server_names.substr(0, server_names.find(" ")) + ":" + serv.get_id();
+				if (serv_name.find(key) != std::string::npos && serv_name[serv_name.find(key) + key.size()] == '|')
+					check_error("server name with this port already exist");
+				serv_name += key + "|";
+				if (server_names.find(" ") != std::string::npos)
+					server_names = server_names.substr(server_names.find(" ") + 1);
+				else
+					break;
+			}
+			std::cout << serv_name << std::endl;
 		}
 		if (s.length() > m_c.next_start)
 			s = s.substr(m_c.next_start);
@@ -565,11 +594,10 @@ std::string urlDecode(std::string str)
 {
 	std::string ret;
 	char ch;
-	int i;
 	int j;
 	int len = str.length();
 
-	for (i = 0; i < len; i++)
+	for (int i = 0; i < len; i++)
 	{
 		if (str[i] != '%')
 		{

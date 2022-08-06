@@ -20,6 +20,7 @@ public:
 	void config(std::string config_file);
 
 	void check_config(std::string config_file);
+	void check_error(std::string reason);
 
 	void run(void);
 	void close_sockets(void);
@@ -34,7 +35,7 @@ public:
 	public:
 		virtual const char *what() const throw()
 		{
-			return ("Server initialisation failed.");
+			return ("server initialisation failed");
 		}
 	};
 
