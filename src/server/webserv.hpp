@@ -22,7 +22,6 @@ public:
 	void close_sockets(void);
 
 	/* Used in run : */
-	static int setup_server(int port, int backlog, sockaddr_in sockaddr);
 	int handle_client_connection(void);
 	int accept_new_connection(int server_fd, sockaddr_in sockaddr);
 
