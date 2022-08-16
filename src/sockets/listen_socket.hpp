@@ -18,13 +18,13 @@ public:
 	sockaddr_in get_addr(void) const;
 
 	class ServerInitFailed : public std::exception
-			{
-			public:
-				virtual const char *what() const throw()
-				{
-					return ("Server initialisation failed.");
-				}
-			};
+	{
+	public:
+		virtual const char *what() const throw()
+		{
+			return ("Error in config file.");
+		}
+	};
 
 private:
 	int _port;

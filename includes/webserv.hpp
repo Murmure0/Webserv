@@ -53,9 +53,6 @@ std::string file_to_string(std::string file_path);
 config_parsing get_next_variable(std::string str);
 void print_line(t_config line);
 
-int setup_server(int port, int backlog, sockaddr_in sockaddr);
-int accept_new_connection(int server_fd);
-
 std::string ft_to_string(size_t i);
 
 std::string complete_url(std::string base_url, std::string to_add);

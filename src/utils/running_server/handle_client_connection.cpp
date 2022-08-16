@@ -53,44 +53,63 @@ int webserv::handle_client_connection(void)
 		// and selecting from ready_sockets;
 		ready_read_sockets = current_sockets;
 
-		// add open responce to ready write sockets.
 		FD_ZERO(&ready_write_sockets);
+		// add open responce to ready write sockets.
 		for (std::map<int, responce>::iterator i = open_responces.begin(); i != open_responces.end(); i++)
 			FD_SET((*i).first, &ready_write_sockets);
 
+		// struct timeval tv used for the timeout in select()
 		struct timeval tv;
 		tv.tv_sec = 8;
 		tv.tv_usec = 0;
 
+		/* select() examines the I/O descriptor sets whose addresses are passed in
+		  readfds and writefds to see if some of their descriptors are ready for readin or are ready for writing
+		  On return, select() replaces the given descriptor sets with subsets consisting of those descriptors that are ready for the requested operation.
+		  select() returns the total number of ready descriptors in all the sets. */
 		ret = select(FD_SETSIZE, &ready_read_sockets, &ready_write_sockets, NULL, &tv);
 
-		if (ret < 0)
+		//Peut etre simplifiée :
+		if (ret < 0 || ret == 0) // error or timeout
 		{
-			std::cout << "HoNo, select failed D:" << std::endl;
-			exit(1);
-		}
-		else if (ret == 0)
-		{
-
-			// std::cout << &ready_read_sockets << std::endl;
-			// handle times out
-			// clear responces and send to them 408 error
-			for (std::map<int, request>::iterator i = open_requests.begin(); i != open_requests.end(); i++)
+			if (ret < 0)
 			{
-				std::ifstream infile("./default_error_pages/408.html");
-				std::stringstream ss;
-				std::string str_resp;
+				// creat the error strings 
+				for (std::map<int, request>::iterator i = open_requests.begin(); i != open_requests.end(); i++)
+				{
+					std::ifstream infile("./default_error_pages/500.html");
+					std::string str_status = "500 Internal Server Error";
 
-				ss << infile.rdbuf();
+					std::stringstream ss;
+					std::string str_resp;
+					ss << infile.rdbuf();
 
-				// adding the minimal http header-ever to the file content:
-				str_resp = "HTTP/1.1 408 Request Timeout\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: text/html" + "\r\n\r\n" + ss.str() + "\r\n";
-				infile.close();
-
-				int len = str_resp.size();
-				send((*i).first, (char *)str_resp.c_str(), len, 0);
-				close((*i).first);
+					str_resp = "HTTP/1.1 "+ str_status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: text/html" + "\r\n\r\n" + ss.str() + "\r\n";
+					infile.close();
+					int len = str_resp.size();
+					send((*i).first, (char *)str_resp.c_str(), len, 0);
+					close((*i).first);
+				}
 			}
+			else
+			{
+				for (std::map<int, request>::iterator i = open_requests.begin(); i != open_requests.end(); i++)
+				{
+					std::ifstream infile("./default_error_pages/408.html");
+					std::string str_status = "408 Request Timeout";
+
+					std::stringstream ss;
+					std::string str_resp;
+					ss << infile.rdbuf();
+
+					str_resp = "HTTP/1.1 "+ str_status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: text/html" + "\r\n\r\n" + ss.str() + "\r\n";
+					infile.close();
+					int len = str_resp.size();
+					send((*i).first, (char *)str_resp.c_str(), len, 0);
+					close((*i).first);
+				}
+			}
+			//close open_responces
 			for (std::map<int, responce>::iterator i = open_responces.begin(); i != open_responces.end(); i++)
 			{
 				close((*i).first);
@@ -108,9 +127,8 @@ int webserv::handle_client_connection(void)
 			open_requests.erase(open_requests.begin(), open_requests.end());
 		}
 
-		// wait for, and eventually accept and handle an incoming connection
-
-		// loop on open_responces to send a small part of the response to each client
+		// /!\/!\/!\/!\ Zone en chantier :
+		// loop on open_responces to send a small part of the response to each client simultaneously
 		for (std::map<int, responce>::iterator i = open_responces.begin(); i != open_responces.end(); i++)
 		{
 			if (FD_ISSET((*i).first, &ready_write_sockets))
@@ -178,7 +196,7 @@ int webserv::handle_client_connection(void)
 			if (FD_ISSET((*i).first, &ready_read_sockets))
 			{
 				(*i).second.read_and_append((*i).first);
-				if ((*i).second.is_completed())
+				if ((*i).second.is_completed()) // Error checking for the responce
 				{
 					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(),(*i).second.get_addr_ip(), (*i).second.get_content_size(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path(), (*i).second.get_header()));
 					FD_CLR((*i).first, &current_sockets);
@@ -192,7 +210,7 @@ int webserv::handle_client_connection(void)
 		for (std::vector<listen_socket>::iterator i = _listen_sockets.begin(); i != _listen_sockets.end(); i++)
 		{
 			// if socket ready create socket
-			if (FD_ISSET((*i).get_fd(), &ready_read_sockets))
+			if (FD_ISSET((*i).get_fd(), &ready_read_sockets)) //Error checking for the header oh the request
 			{
 				int client_socket = accept_new_connection((*i).get_fd(), (*i).get_addr());
 				open_requests[client_socket] = request(this->_addr_ip);

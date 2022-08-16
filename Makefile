@@ -14,7 +14,6 @@ SOURCES = 	./src/parsing_main.cpp \
 			./src/sockets/listen_socket.cpp \
 			./src/utils/config_parsing.cpp \
 			./src/utils/url_manipulation.cpp \
-			./src/utils/running_server/setup_server.cpp \
 			./src/utils/running_server/handle_client_connection.cpp \
 			./src/http/request.cpp \
 			./src/http/responce.cpp \

@@ -24,6 +24,18 @@ int main(int argc, char **argv)
 	try
 	{
 		if (argc != 2)
+			ws.check_config("src/config/config_file.conf");
+		else
+			ws.check_config(argv[1]);
+	}
+	catch (webserv::BadConfig &e)
+	{
+		std::cerr << e.what() << std ::endl;
+		exit(1);
+	}
+	try
+	{
+		if (argc != 2)
 			ws.config("src/config/config_file.conf");
 		else
 			ws.config(argv[1]);
