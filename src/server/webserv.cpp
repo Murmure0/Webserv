@@ -640,12 +640,14 @@ t_responce_config webserv::generate_config(std::string host, std::string path, s
 			config.path = complete_url(config.path, path.substr(loc->get_location_match().size()));
 		else
 			config.path = complete_url(config.path, path);
+		config.error_pages = set_errors(&(selected->get_error_pages()), &(loc->get_error_pages()));
 	}
 	else
 	{
 		// get config from server
 		selected->config_responce(&config);
 		config.path += rtrim(path, "/");
+		config.error_pages = set_errors(&(selected->get_error_pages()), NULL);
 	}
 	// std::cout << config.path << " " << config.root << " " << config.index << std::endl;
 	//  add index if exist
@@ -662,7 +664,48 @@ t_responce_config webserv::generate_config(std::string host, std::string path, s
 		// std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | alone | " << config.path << std::endl;
 	}
 	config.header = header;
+	// std::cout << config.error_pages["404"] << std::endl;
 	return config;
+}
+
+std::map<std::string, std::string> set_errors(std::map<std::string, std::string> *server_errors, std::map<std::string, std::string> *location_errors)
+{
+	std::map<std::string, std::string> errors;
+
+	errors["400"] = "./default_error_pages/400.html";
+	errors["401"] = "./default_error_pages/401.html";
+	errors["402"] = "./default_error_pages/402.html";
+	errors["403"] = "./default_error_pages/403.html";
+	errors["404"] = "./default_error_pages/404.html";
+	errors["405"] = "./default_error_pages/405.html";
+	errors["406"] = "./default_error_pages/406.html";
+	errors["407"] = "./default_error_pages/407.html";
+	errors["408"] = "./default_error_pages/408.html";
+	errors["409"] = "./default_error_pages/409.html";
+	errors["410"] = "./default_error_pages/410.html";
+	errors["411"] = "./default_error_pages/411.html";
+	errors["412"] = "./default_error_pages/412.html";
+	errors["413"] = "./default_error_pages/413.html";
+	errors["414"] = "./default_error_pages/414.html";
+	errors["415"] = "./default_error_pages/415.html";
+	errors["418"] = "./default_error_pages/418.html";
+	errors["500"] = "./default_error_pages/500.html";
+	errors["501"] = "./default_error_pages/501.html";
+	errors["502"] = "./default_error_pages/502.html";
+	errors["503"] = "./default_error_pages/503.html";
+	errors["504"] = "./default_error_pages/504.html";
+	errors["505"] = "./default_error_pages/505.html";
+
+	for (std::map<std::string, std::string>::iterator i = (*server_errors).begin(); i != (*server_errors).end(); i++)
+		errors[(*i).first] = (*i).second;
+
+	if (location_errors != NULL)
+	{
+		for (std::map<std::string, std::string>::iterator i = (*location_errors).begin(); i != (*location_errors).end(); i++)
+			errors[(*i).first] = (*i).second;
+	}
+
+	return errors;
 }
 
 std::map<std::string, std::string> *webserv::get_mime(void)

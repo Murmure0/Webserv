@@ -39,6 +39,7 @@ typedef struct config
 	size_t max_body_size;
 	bool autoindex;
 	std::string header;
+	std::map<std::string, std::string> error_pages;
 } t_responce_config;
 
 typedef struct config_parsing
@@ -59,6 +60,7 @@ std::string complete_url(std::string base_url, std::string to_add);
 std::string ltrim(const std::string &s, const std::string &set);
 std::string rtrim(const std::string &s, const std::string &set);
 std::string trim(const std::string &s, const std::string &set);
+std::map<std::string, std::string> set_errors(std::map<std::string, std::string> *server_errors, std::map<std::string, std::string> *location_errors);
 bool compare_url(std::string url1, std::string url2);
 
 #include "../src/http/request_config.hpp"

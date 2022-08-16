@@ -27,7 +27,7 @@ public:
 	/*
 	generate an auto index page by listing directories and files in a location
 	*/
-	std::string generate_auto_index(std::string path, std::string url) const;
+	std::string generate_auto_index(std::string path, std::string url);
 
 	/*
 	generate a standard get responce if ressource exist. If not return a 404 error page.
@@ -40,7 +40,7 @@ public:
 
 	bool is_sent(void) const;
 
-	std::string get_response() {return _responce;}
+	std::string get_response() { return _responce; }
 
 private:
 	std::map<std::string, std::string> *_mime;
@@ -50,20 +50,20 @@ private:
 	std::string _responce;
 	bool _responce_ready;
 	bool _sent;
-	std::string	_body;
-	std::map<std::string, std::string>	_header;
-	std::string							_addr_ip;
+	std::string _body;
+	std::map<std::string, std::string> _header;
+	std::string _addr_ip;
 
-	std::string							cgi_execute();
-	std::vector<std::string>			cgi_env();
-	std::map<std::string, std::string>	header_to_map(std::string str);
-	void								child_process(int *fd_in, int *fd_out, char **env);
-	std::string							parent_process(pid_t pid, int *fd_out, int status);
-	char								**vec_to_char(std::vector<std::string> vec_env);
-	std::string							find_the_shebang_line(std::string script);
+	std::string cgi_execute();
+	std::vector<std::string> cgi_env();
+	std::map<std::string, std::string> header_to_map(std::string str);
+	void child_process(int *fd_in, int *fd_out, char **env);
+	std::string parent_process(pid_t pid, int *fd_out, int status);
+	char **vec_to_char(std::vector<std::string> vec_env);
+	std::string find_the_shebang_line(std::string script);
 
-	///essais
-	size_t								_contentlenght;
+	/// essais
+	size_t _contentlenght;
 };
 
 #endif // RESPONCE_H

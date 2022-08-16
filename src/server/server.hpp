@@ -30,12 +30,15 @@ public:
 	location *get_location(std::string path);
 	void config_responce(t_responce_config *config);
 
+	std::map<std::string, std::string> &get_error_pages(void);
+
 private:
 	size_t _port;
 	std::string _server_name;
 	std::string _method;
 	std::string _root;
 	std::string _index;
+	std::map<std::string, std::string> _error_pages;
 	size_t _max_body_size;
 	bool _autoindex;
 

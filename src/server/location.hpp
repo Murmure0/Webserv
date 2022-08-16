@@ -22,6 +22,7 @@ public:
 	*/
 	void config_responce(t_responce_config *config);
 	bool have_root(void);
+	std::map<std::string, std::string> &get_error_pages(void);
 
 private:
 	std::string _location_match;
@@ -30,6 +31,7 @@ private:
 	std::string _index;
 	std::string _uploads;
 	std::string _directory_listing;
+	std::map<std::string, std::string> _error_pages;
 	size_t _max_body_size;
 	bool _autoindex;
 	bool _autoindex_set;

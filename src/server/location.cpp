@@ -24,6 +24,7 @@ location::location(location const &copy)
 	this->_root = copy._root;
 	this->_uploads = copy._uploads;
 	this->_autoindex_set = copy._autoindex_set;
+	this->_error_pages = copy._error_pages;
 }
 
 location &location::operator=(location const &rhs)
@@ -37,10 +38,11 @@ location &location::operator=(location const &rhs)
 	this->_root = rhs._root;
 	this->_uploads = rhs._uploads;
 	this->_autoindex_set = rhs._autoindex_set;
+	this->_error_pages = rhs._error_pages;
 	return *this;
 }
 
-//a enlever
+// a enlever
 void location::print(void) const
 {
 	std::cout << "\t"
@@ -86,6 +88,10 @@ void location::set(std::string key, std::string value)
 			_autoindex = (value == "on") ? true : false;
 		_autoindex_set = true;
 	}
+	else if (key == "error_page")
+	{
+		_error_pages[value.substr(0, value.find(" "))] = value.substr(value.find(" ") + 1);
+	}
 }
 
 std::string location::get_location_match(void)
@@ -114,4 +120,9 @@ void location::config_responce(t_responce_config *config)
 bool location::have_root(void)
 {
 	return !_root.empty();
+}
+
+std::map<std::string, std::string> &location::get_error_pages(void)
+{
+	return _error_pages;
 }

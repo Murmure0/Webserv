@@ -23,6 +23,7 @@ server::server(server const &to_copy)
 	this->_port = to_copy._port;
 	this->_root = to_copy._root;
 	this->_server_name = to_copy._server_name;
+	this->_error_pages = to_copy._error_pages;
 }
 
 server &server::operator=(server const &rhs)
@@ -35,6 +36,7 @@ server &server::operator=(server const &rhs)
 	this->_port = rhs._port;
 	this->_root = rhs._root;
 	this->_server_name = rhs._server_name;
+	this->_error_pages = rhs._error_pages;
 	return *this;
 }
 
@@ -77,6 +79,10 @@ void server::set(std::string key, std::string value)
 			_autoindex = true;
 		else
 			_autoindex = (value == "on") ? true : false;
+	}
+	else if (key == "error_page")
+	{
+		_error_pages[value.substr(0, value.find(" "))] = value.substr(value.find(" ") + 1);
 	}
 }
 
@@ -124,4 +130,9 @@ void server::config_responce(t_responce_config *config)
 	(*config).path = _root;
 	(*config).index = _index;
 	(*config).root = _root;
+}
+
+std::map<std::string, std::string> &server::get_error_pages(void)
+{
+	return _error_pages;
 }

@@ -57,7 +57,7 @@ std::string responce::geterate_responce()
 		return _responce;
 	if (_config.method.find(_method) == std::string::npos)
 	{
-		return generate_get_responce("./default_error_pages/405.html", "HTTP/1.1", "405 Method Not Allowed", "text/html", true);
+		return generate_get_responce(_config.error_pages["405"], "HTTP/1.1", "405 Method Not Allowed", "text/html", true);
 	}
 
 	// if delete method just delete the file. If not exist or not possible to delete return 404.
@@ -68,7 +68,7 @@ std::string responce::geterate_responce()
 		if (status == 0)
 			return "HTTP/1.1 200 OK\nContent-Length: 0\r\n\r\n\r\n";
 		else
-			return generate_get_responce("./default_error_pages/404.html", "HTTP/1.1", "404 Not Found", "text/html", true);
+			return generate_get_responce(_config.error_pages["404"], "HTTP/1.1", "404 Not Found", "text/html", true);
 	}
 
 	if (_method == "POST")
@@ -76,7 +76,7 @@ std::string responce::geterate_responce()
 		cgi = cgi_execute();
 		std::cout << "CGI == " << cgi << std::endl;
 		if (cgi.empty())
-			return generate_get_responce("./default_error_pages/500.html", "HTTP/1.1", "500 Internal Server Error", "text/html", true);
+			return generate_get_responce(_config.error_pages["500"], "HTTP/1.1", "500 Internal Server Error", "text/html", true);
 		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
 		// voir quand utilisé le code status 201 Created, qd on a cree un fichier avec POST
 	}
@@ -85,20 +85,20 @@ std::string responce::geterate_responce()
 	if (_current_mime.size() == 0)
 	{
 		if (!_config.autoindex)
-			return generate_get_responce("./default_error_pages/404.html", "HTTP/1.1", "404 Not Found", "text/html", true);
+			return generate_get_responce(_config.error_pages["404"], "HTTP/1.1", "404 Not Found", "text/html", true);
 		return generate_auto_index(_config.path, _config.url);
 	}
 	if (_config.path.find("?") != std::string::npos || _config.path.find(".py") != std::string::npos)
 	{
 		cgi = cgi_execute();
 		if (cgi.empty())
-			return generate_get_responce("./default_error_pages/500.html", "HTTP/1.1", "500 Internal Server Error", "text/html", true);
+			return generate_get_responce(_config.error_pages["500"], "HTTP/1.1", "500 Internal Server Error", "text/html", true);
 		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
 	}
 	return generate_get_responce(_config.path, "HTTP/1.1", "200 OK", _current_mime);
 };
 
-std::string responce::generate_auto_index(std::string path, std::string url) const
+std::string responce::generate_auto_index(std::string path, std::string url)
 {
 	std::string ret_str = "<!DOCTYPE html><html lang='en'><head><meta charset='utf-8'><title> Index of" + path + "</title></head><body>";
 	DIR *cd;
@@ -108,7 +108,7 @@ std::string responce::generate_auto_index(std::string path, std::string url) con
 	cd = opendir(path.c_str());
 	// check if location is ok
 	if (!cd)
-		return generate_get_responce("./default_error_pages/404.html", "HTTP/1.1", "404 Not Found", "text/html", true);
+		return generate_get_responce(_config.error_pages["404"], "HTTP/1.1", "404 Not Found", "text/html", true);
 
 	ci = readdir(cd);
 	// loop in files and directories. the second arg url is used to create a complete path to the ressource
@@ -120,7 +120,7 @@ std::string responce::generate_auto_index(std::string path, std::string url) con
 
 	ret_str += "</body></html>";
 
-	return "HTTP/1.1 200 OK\r\n\r\n" + ret_str + "\r\n";
+	return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(ret_str.length()) + "\nContent-Type: text/html\r\n\r\n" + ret_str + "\r\n";
 }
 
 std::string responce::generate_get_responce(std::string path, std::string http_version, std::string status, std::string mime, bool not_fail) const
