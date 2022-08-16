@@ -63,7 +63,7 @@ std::string responce::geterate_responce()
 		return "HTTP/1.1 " + code + " Moved Permanently" + "\n" + "Location: " + url + "\n\r\n\r\n\r";
 	}
 
-	if (all_methods.find(_method) == std::string::npos)
+	if (all_methods.find(_method) == std::string::npos || _method.find_first_of("|") != std::string::npos)
 	{
 		return generate_get_responce(_config.error_pages["501"], "HTTP/1.1", "501 Not Implemented Error", "text/html", true);
 	}

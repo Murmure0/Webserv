@@ -631,6 +631,7 @@ t_responce_config webserv::generate_config(std::string host, std::string path, s
 	location *loc = selected->get_location(path);
 	t_responce_config config;
 	config.url = path;
+
 	if (loc)
 	{
 		// get config from server and overide it with location

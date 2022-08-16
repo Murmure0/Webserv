@@ -135,6 +135,7 @@ std::string request::get_path(void) const
 {
 	std::string path = _header.substr(0, _header.find("\n") - 1);
 	path = path.substr(path.find(" ") + 1);
+	path = path.substr(path.find_first_not_of(" "));
 	path = path.substr(0, path.find(" "));
 	return path;
 }
