@@ -655,7 +655,7 @@ t_responce_config webserv::generate_config(std::string host, std::string path, s
 	}
 	if (loc)
 	{
-		std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | loc: " << loc->get_location_match() << " | " << config.path << " | " << config.method << std::endl;
+		// std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | loc: " << loc->get_location_match() << " | " << config.path << " | " << config.method << std::endl;
 	}
 	else
 	{

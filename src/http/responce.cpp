@@ -66,9 +66,9 @@ std::string responce::geterate_responce()
 		int status;
 		status = remove(_config.path.c_str());
 		if (status == 0)
-			return "HTTP/1.1 200 OK\r\n\r\n\r\n";
+			return "HTTP/1.1 200 OK\nContent-Length: 0\r\n\r\n\r\n";
 		else
-			return "HTTP/1.1 404 Not Found\r\n\r\n\r\n";
+			return generate_get_responce("./default_error_pages/404.html", "HTTP/1.1", "404 Not Found", "text/html", true);
 	}
 
 	if (_method == "POST")
@@ -78,7 +78,7 @@ std::string responce::geterate_responce()
 		if (cgi.empty())
 			return generate_get_responce("./default_error_pages/500.html", "HTTP/1.1", "500 Internal Server Error", "text/html", true);
 		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
-		//voir quand utilisé le code status 201 Created, qd on a cree un fichier avec POST
+		// voir quand utilisé le code status 201 Created, qd on a cree un fichier avec POST
 	}
 
 	// check if ask for auto index or return statdard get responce
@@ -145,8 +145,6 @@ std::string responce::generate_get_responce(std::string path, std::string http_v
 	infile.close();
 	return str_resp;
 }
-
-
 
 void responce::set_responce(std::string responce)
 {

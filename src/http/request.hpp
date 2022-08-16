@@ -3,7 +3,6 @@
 #ifndef REQUEST_H
 #define REQUEST_H
 
-
 class request
 {
 public:
@@ -18,11 +17,13 @@ public:
 	/*
 	this function will fill the request object by reading BUFFER_SIZE by BUFFER_SIZE char on specific fd
 	*/
-	void read_and_append(int fd);
+
+	void clear(void);
+	int read_and_append(int fd);
 	bool is_completed(void) const;
 	std::string get_header(void) const;
 	std::string get_body(void) const;
-	std::string	get_addr_ip(void) const;
+	std::string get_addr_ip(void) const;
 	void set_request_config(void);
 
 	/*
@@ -36,11 +37,11 @@ public:
 	*/
 	std::string get_path(void) const;
 
-	size_t		get_content_size(void) const;
+	size_t get_content_size(void) const;
 
 private:
 	std::string _header, _body;
-	std::string	_addr_ip;
+	std::string _addr_ip;
 	size_t _content_size;
 	bool _header_completed;
 	bool _request_completed;

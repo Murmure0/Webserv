@@ -55,17 +55,29 @@ void request::set_request_config()
 	// _request_config.set_host();
 	// _request_config.set_port();
 	std::cout << std::endl;
-
 }
 
-void request::read_and_append(int fd)
+void request::clear(void)
+{
+	_body = "";
+	_header = "";
+	_header_completed = false;
+	_request_completed = false;
+	_content_size = -1;
+}
+
+int request::read_and_append(int fd)
 {
 	char buffer[BUFFER_SIZE];
 	size_t bytes_read;
 
 	if (_request_completed)
-		return;
+		return 0;
 	bytes_read = recv(fd, buffer, BUFFER_SIZE - 1, 0);
+	if (bytes_read <= 0)
+	{
+		return -1;
+	}
 	// if header is not fully received
 	if (!_header_completed)
 	{
@@ -79,9 +91,9 @@ void request::read_and_append(int fd)
 			_body = _header.substr(_header.find("\r\n\r\n") + 4);
 			_header = _header.substr(0, _header.find("\r\n\r\n"));
 			config_content_size(_header);
-			//std::cout << "XXX|"<< _header << "|XXX"<< std::endl;
-			//fill request_config
-			set_request_config();
+			// std::cout << "XXX|"<< _header << "|XXX"<< std::endl;
+			// fill request_config
+			// set_request_config();
 		}
 	}
 	else
@@ -94,6 +106,7 @@ void request::read_and_append(int fd)
 		_request_completed = true;
 		// std::cout << _header << std::endl;
 	}
+	return 0;
 }
 
 bool request::is_completed(void) const
@@ -126,12 +139,12 @@ std::string request::get_path(void) const
 	return path;
 }
 
-size_t		request::get_content_size(void) const
+size_t request::get_content_size(void) const
 {
 	return this->_content_size;
 }
 
-std::string	request::get_addr_ip(void) const
+std::string request::get_addr_ip(void) const
 {
 	return this->_addr_ip;
 }

@@ -3,8 +3,8 @@
 
 int webserv::accept_new_connection(int server_fd, sockaddr_in sockaddr)
 {
-	char	buff[16];
-	char	buff_b[30];
+	char buff[16];
+	char buff_b[30];
 	unsigned long addrlen = sizeof(sockaddr);
 	int connection = accept(server_fd, (struct sockaddr *)&sockaddr, (socklen_t *)&addrlen);
 	if (connection < 0)
@@ -13,7 +13,7 @@ int webserv::accept_new_connection(int server_fd, sockaddr_in sockaddr)
 		return -1;
 	}
 
-    inet_ntop(AF_INET, &(sockaddr.sin_addr.s_addr), buff, INET_ADDRSTRLEN);
+	inet_ntop(AF_INET, &(sockaddr.sin_addr.s_addr), buff, INET_ADDRSTRLEN);
 	if (!buff[0])
 	{
 		inet_ntop(AF_INET6, &(sockaddr.sin_addr.s_addr), buff_b, INET6_ADDRSTRLEN);
@@ -69,12 +69,12 @@ int webserv::handle_client_connection(void)
 		  select() returns the total number of ready descriptors in all the sets. */
 		ret = select(FD_SETSIZE, &ready_read_sockets, &ready_write_sockets, NULL, &tv);
 
-		//Peut etre simplifiée :
+		// Peut etre simplifiée :
 		if (ret < 0 || ret == 0) // error or timeout
 		{
 			if (ret < 0)
 			{
-				// creat the error strings 
+				// creat the error strings
 				for (std::map<int, request>::iterator i = open_requests.begin(); i != open_requests.end(); i++)
 				{
 					std::ifstream infile("./default_error_pages/500.html");
@@ -84,7 +84,7 @@ int webserv::handle_client_connection(void)
 					std::string str_resp;
 					ss << infile.rdbuf();
 
-					str_resp = "HTTP/1.1 "+ str_status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: text/html" + "\r\n\r\n" + ss.str() + "\r\n";
+					str_resp = "HTTP/1.1 " + str_status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: text/html" + "\r\n\r\n" + ss.str() + "\r\n";
 					infile.close();
 					int len = str_resp.size();
 					send((*i).first, (char *)str_resp.c_str(), len, 0);
@@ -102,14 +102,14 @@ int webserv::handle_client_connection(void)
 					std::string str_resp;
 					ss << infile.rdbuf();
 
-					str_resp = "HTTP/1.1 "+ str_status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: text/html" + "\r\n\r\n" + ss.str() + "\r\n";
+					str_resp = "HTTP/1.1 " + str_status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: text/html" + "\r\n\r\n" + ss.str() + "\r\n";
 					infile.close();
 					int len = str_resp.size();
 					send((*i).first, (char *)str_resp.c_str(), len, 0);
 					close((*i).first);
 				}
 			}
-			//close open_responces
+			// close open_responces
 			for (std::map<int, responce>::iterator i = open_responces.begin(); i != open_responces.end(); i++)
 			{
 				close((*i).first);
@@ -143,14 +143,12 @@ int webserv::handle_client_connection(void)
 
 				// sending to client :
 				// call new function in responce to get BUFFERSIZE each time
-				send((*i).first, str_resp.c_str(), len, 0);
+				send((*i).first, str_resp.c_str(), len, MSG_EOR);
 
 				// erase responce
 				if ((*i).second.is_sent())
 				{
 					open_responces.erase(i);
-					//close((*i).first);
-					//FD_CLR((*i).first, &current_sockets);
 					break;
 				}
 			}
@@ -161,12 +159,20 @@ int webserv::handle_client_connection(void)
 		{
 			if (FD_ISSET((*i).first, &ready_read_sockets))
 			{
-				(*i).second.read_and_append((*i).first); //Error checking for the header oh the request
+				int ret = (*i).second.read_and_append((*i).first);
+				if (ret < 0)
+				{
+					std::cout << "need close" << std::endl;
+					open_requests.erase(i);
+					open_responces.erase((*i).first);
+					FD_CLR((*i).first, &current_sockets);
+					close((*i).first);
+					break;
+				}
 				if ((*i).second.is_completed())
 				{
-					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(),(*i).second.get_addr_ip(), (*i).second.get_content_size(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path(), (*i).second.get_header()));
-					FD_CLR((*i).first, &current_sockets);
-					open_requests.erase(i);
+					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(), (*i).second.get_addr_ip(), (*i).second.get_content_size(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path(), (*i).second.get_header()));
+					open_requests[(*i).first].clear();
 					break;
 				}
 			}
