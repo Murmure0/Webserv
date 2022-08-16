@@ -21,7 +21,7 @@ $user_message  = $FORM{user_message};
 
 print "<html>";
 print "<head>";
-print "<title>Hello - Second CGI Program</title>";
+print "<title>Hello.pr</title>";
 print "</head>";
 print "<body>";
 print "<h2>Hello $user_name </h2>";

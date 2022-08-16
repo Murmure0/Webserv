@@ -17,7 +17,7 @@ print ("<title>Webserv CGI</title>")
 print ("</head>")
 print ("<body>")
 print ("<h2>Hello %s</h2>" % (user_name,))
-print ("<p>Le message est : %s</p>" % (user_message))
+print ("<p>Le message est : %s</p>" % (user_message.replace("\n", "</br>")))
 print ("</body>")
 print ("</html>")
 
