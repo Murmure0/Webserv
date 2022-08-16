@@ -52,6 +52,7 @@ responce &responce::operator=(responce const &rhs)
 std::string responce::geterate_responce()
 {
 	std::string cgi;
+	std::string all_methods = "GET|POST|DELETE";
 
 	if (_responce_ready)
 		return _responce;
@@ -60,6 +61,11 @@ std::string responce::geterate_responce()
 		std::string code = _config.redirect.substr(0, _config.redirect.find(" "));
 		std::string url = _config.redirect.substr(_config.redirect.find(" ") + 1);
 		return "HTTP/1.1 " + code + " Moved Permanently" + "\n" + "Location: " + url + "\n\r\n\r\n\r";
+	}
+
+	if (all_methods.find(_method) == std::string::npos)
+	{
+		return generate_get_responce(_config.error_pages["501"], "HTTP/1.1", "501 Not Implemented Error", "text/html", true);
 	}
 
 	if (_config.method.find(_method) == std::string::npos)
