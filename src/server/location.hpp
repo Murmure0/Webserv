@@ -31,6 +31,7 @@ private:
 	std::string _index;
 	std::string _uploads;
 	std::string _directory_listing;
+	std::string _redirect;
 	std::map<std::string, std::string> _error_pages;
 	size_t _max_body_size;
 	bool _autoindex;

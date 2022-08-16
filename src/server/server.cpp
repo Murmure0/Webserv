@@ -24,6 +24,7 @@ server::server(server const &to_copy)
 	this->_root = to_copy._root;
 	this->_server_name = to_copy._server_name;
 	this->_error_pages = to_copy._error_pages;
+	this->_redirect = to_copy._redirect;
 }
 
 server &server::operator=(server const &rhs)
@@ -37,6 +38,7 @@ server &server::operator=(server const &rhs)
 	this->_root = rhs._root;
 	this->_server_name = rhs._server_name;
 	this->_error_pages = rhs._error_pages;
+	this->_redirect = rhs._redirect;
 	return *this;
 }
 
@@ -84,6 +86,8 @@ void server::set(std::string key, std::string value)
 	{
 		_error_pages[value.substr(0, value.find(" "))] = value.substr(value.find(" ") + 1);
 	}
+	else if (key == "return")
+		_redirect = value;
 }
 
 std::string server::get_id(void) const
@@ -130,6 +134,7 @@ void server::config_responce(t_responce_config *config)
 	(*config).path = _root;
 	(*config).index = _index;
 	(*config).root = _root;
+	(*config).redirect = _redirect;
 }
 
 std::map<std::string, std::string> &server::get_error_pages(void)

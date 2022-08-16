@@ -16,6 +16,7 @@ print(f"""
 <head>
 <link rel="stylesheet" href="/static/index.css">
 <link rel="stylesheet" href="/static/delete.css">
+<link rel="stylesheet" href="/static/download.css">
 </head>
 <body>
 <section>

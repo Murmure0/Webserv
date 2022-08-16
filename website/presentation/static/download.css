@@ -1,0 +1,7 @@
+a {
+	text-decoration: none;
+}
+
+section li:hover {
+	background-color: var(--success);
+}

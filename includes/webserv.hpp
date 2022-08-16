@@ -36,6 +36,7 @@ typedef struct config
 	std::string path;
 	std::string root;
 	std::string index;
+	std::string redirect;
 	size_t max_body_size;
 	bool autoindex;
 	std::string header;

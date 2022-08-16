@@ -38,6 +38,7 @@ private:
 	std::string _method;
 	std::string _root;
 	std::string _index;
+	std::string _redirect;
 	std::map<std::string, std::string> _error_pages;
 	size_t _max_body_size;
 	bool _autoindex;

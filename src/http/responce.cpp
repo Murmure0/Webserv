@@ -55,6 +55,13 @@ std::string responce::geterate_responce()
 
 	if (_responce_ready)
 		return _responce;
+	if (!_config.redirect.empty())
+	{
+		std::string code = _config.redirect.substr(0, _config.redirect.find(" "));
+		std::string url = _config.redirect.substr(_config.redirect.find(" ") + 1);
+		return "HTTP/1.1 " + code + " Moved Permanently" + "\n" + "Location: " + url + "\n\r\n\r\n\r";
+	}
+
 	if (_config.method.find(_method) == std::string::npos)
 	{
 		return generate_get_responce(_config.error_pages["405"], "HTTP/1.1", "405 Method Not Allowed", "text/html", true);
