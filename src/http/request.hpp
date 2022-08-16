@@ -1,8 +1,8 @@
+#include "../../includes/webserv.hpp"
 
 #ifndef REQUEST_H
 #define REQUEST_H
 
-#include "../../includes/webserv.hpp"
 
 class request
 {
@@ -23,6 +23,7 @@ public:
 	std::string get_header(void) const;
 	std::string get_body(void) const;
 	std::string	get_addr_ip(void) const;
+	void set_request_config(void);
 
 	/*
 	get string between host: and the next space
@@ -43,6 +44,7 @@ private:
 	size_t _content_size;
 	bool _header_completed;
 	bool _request_completed;
+	request_config _request_config;
 };
 
 #endif // REQUEST_H

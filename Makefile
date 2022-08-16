@@ -16,6 +16,7 @@ SOURCES = 	./src/parsing_main.cpp \
 			./src/utils/url_manipulation.cpp \
 			./src/utils/running_server/handle_client_connection.cpp \
 			./src/http/request.cpp \
+			./src/http/request_config.cpp \
 			./src/http/responce.cpp \
 			./src/cgi/cgi.cpp \
 			./includes/ft.cpp \

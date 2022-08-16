@@ -40,6 +40,7 @@ location &location::operator=(location const &rhs)
 	return *this;
 }
 
+//a enlever
 void location::print(void) const
 {
 	std::cout << "\t"

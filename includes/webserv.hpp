@@ -61,5 +61,6 @@ std::string rtrim(const std::string &s, const std::string &set);
 std::string trim(const std::string &s, const std::string &set);
 bool compare_url(std::string url1, std::string url2);
 
+#include "../src/http/request_config.hpp"
 #include "../src/http/request.hpp"
 #include "../src/http/responce.hpp"

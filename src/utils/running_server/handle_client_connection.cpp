@@ -133,41 +133,7 @@ int webserv::handle_client_connection(void)
 		{
 			if (FD_ISSET((*i).first, &ready_write_sockets))
 			{
-				// std::string str_send = (*i).second.geterate_responce();
-				// (*i).second.set_responce(str_send);
 
-				// static std::map<int, size_t> data_sent; // map <fd_client, qty_data_already_sent> data_sent
-
-				// if(!data_sent.count((*i).first))
-				// 	data_sent[(*i).first] = 0;
-
-				// int size = std::min((unsigned long)SEND_BUFFER_SIZE,(str_send.size() - data_sent[(*i).first]));
-
-				// int ret = send ((*i).first, (char *)(str_send.c_str() + data_sent[(*i).first]), size, 0); //sending the string begining at (str + data_already_sent)
-				// if (ret == -1) // sending error
-				// {
-				// 	open_requests.erase((*i).first);
-				// 	open_responces.erase((*i).first);
-				// 	data_sent[(*i).first] = 0;
-				// 	FD_CLR((*i).first, &current_sockets);
-				// 	FD_CLR((*i).first, &ready_read_sockets);
-				// 	FD_CLR((*i).first, &ready_write_sockets);
-				// 	close((*i).first);
-				// }
-				// else // we've sent something
-				// {
-				// 	data_sent[(*i).first] += ret; // Increasing data_already_sent
-				// 	if (data_sent[(*i).first] >= str_send.size()) // we've finished to sent the body to the buddy
-				// 	{
-				// 		data_sent[(*i).first] = 0;
-				// 		open_requests.erase((*i).first); // NEED REVIEW : not sure which socket FD_CLR &  what to erase
-				// 		open_responces.erase((*i).first);
-				// 	}
-				// }
-				// ret = 0;
-				// break;
-
-				/* first method :*/
 				// // save in the responce. Once save don't call anymore
 				std::string str_resp = (*i).second.geterate_responce();
 				(*i).second.set_responce(str_resp);
@@ -195,8 +161,8 @@ int webserv::handle_client_connection(void)
 		{
 			if (FD_ISSET((*i).first, &ready_read_sockets))
 			{
-				(*i).second.read_and_append((*i).first);
-				if ((*i).second.is_completed()) // Error checking for the responce
+				(*i).second.read_and_append((*i).first); //Error checking for the header oh the request
+				if ((*i).second.is_completed())
 				{
 					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(),(*i).second.get_addr_ip(), (*i).second.get_content_size(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path(), (*i).second.get_header()));
 					FD_CLR((*i).first, &current_sockets);
@@ -210,7 +176,7 @@ int webserv::handle_client_connection(void)
 		for (std::vector<listen_socket>::iterator i = _listen_sockets.begin(); i != _listen_sockets.end(); i++)
 		{
 			// if socket ready create socket
-			if (FD_ISSET((*i).get_fd(), &ready_read_sockets)) //Error checking for the header oh the request
+			if (FD_ISSET((*i).get_fd(), &ready_read_sockets))
 			{
 				int client_socket = accept_new_connection((*i).get_fd(), (*i).get_addr());
 				open_requests[client_socket] = request(this->_addr_ip);

@@ -36,6 +36,28 @@ void request::config_content_size(std::string header)
 	}
 };
 
+void request::set_request_config()
+{
+	std::cout << std::endl;
+	std::cout << "In request config : " << std::endl;
+	size_t methode_pos = _header.find("/");
+	std::string meth = _header.substr(0, methode_pos - 1);
+	_request_config.set_methode(meth);
+
+	size_t url_pos = _header.find("http");
+	std::string pre_url = _header.substr(url_pos);
+	size_t end_url_pos = pre_url.find("\n");
+	std::string url = pre_url.substr(0, end_url_pos - 1);
+	_request_config.set_url(url);
+
+	_request_config.set_content_lenght(this->get_content_size());
+
+	// _request_config.set_host();
+	// _request_config.set_port();
+	std::cout << std::endl;
+
+}
+
 void request::read_and_append(int fd)
 {
 	char buffer[BUFFER_SIZE];
@@ -57,6 +79,9 @@ void request::read_and_append(int fd)
 			_body = _header.substr(_header.find("\r\n\r\n") + 4);
 			_header = _header.substr(0, _header.find("\r\n\r\n"));
 			config_content_size(_header);
+			//std::cout << "XXX|"<< _header << "|XXX"<< std::endl;
+			//fill request_config
+			set_request_config();
 		}
 	}
 	else
