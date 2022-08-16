@@ -74,6 +74,7 @@ std::string responce::geterate_responce()
 	if (_method == "POST")
 	{
 		cgi = cgi_execute();
+		std::cout << "CGI == " << cgi << std::endl;
 		if (cgi.empty())
 			return generate_get_responce("./default_error_pages/500.html", "HTTP/1.1", "500 Internal Server Error", "text/html", true);
 		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";

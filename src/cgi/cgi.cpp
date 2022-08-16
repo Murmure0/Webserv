@@ -125,7 +125,7 @@ std::string	responce::find_the_shebang_line(std::string script)
 
 	map.insert(std::make_pair(".py", "/usr/bin/python3"));
 	map.insert(std::make_pair(".php", "/usr/bin/php"));
-	map.insert(std::make_pair(".pl", "/usr/bin/perl"));
+	map.insert(std::make_pair(".pr", "/usr/bin/perl"));
 
 	return map.find(tmp)->second;
 }
