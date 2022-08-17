@@ -88,6 +88,7 @@ std::string responce::geterate_responce()
 
 	if (_method == "POST")
 	{
+		std::cout << "hey !" << _body << std::endl;
 		cgi = cgi_execute();
 		if (cgi.empty())
 			return generate_get_responce(_config.error_pages["500"], "HTTP/1.1", "500 Internal Server Error", "text/html", true);
