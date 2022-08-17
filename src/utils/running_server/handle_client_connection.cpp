@@ -143,7 +143,7 @@ int webserv::handle_client_connection(void)
 
 				// sending to client :
 				// call new function in responce to get BUFFERSIZE each time
-				send((*i).first, str_resp.c_str(), len, MSG_EOR);
+				send((*i).first, str_resp.c_str(), len, 0);
 
 				// erase responce
 				if ((*i).second.is_sent())

@@ -60,6 +60,8 @@ std::string responce::geterate_responce()
 	{
 		std::string code = _config.redirect.substr(0, _config.redirect.find(" "));
 		std::string url = _config.redirect.substr(_config.redirect.find(" ") + 1);
+		if (code == "308")
+			return "HTTP/1.1 " + code + " Permanent Redirect" + "\n" + "Location: " + url + "\n\r\n\r\n\r";
 		return "HTTP/1.1 " + code + " Moved Permanently" + "\n" + "Location: " + url + "\n\r\n\r\n\r";
 	}
 

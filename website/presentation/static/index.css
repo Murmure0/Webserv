@@ -260,3 +260,22 @@ body {
 	padding: 10px 15px;
 	text-align: center;
 }
+
+.poss_elem.big {
+	color: var(--primary);
+	font-weight: bold;
+}
+
+#rage_click_button {
+	position: absolute;
+	color: var(--on_primary);
+	background-color: var(--primary);
+	border-radius: var(--border_radius);
+	padding: 2px 4px;
+	box-shadow: var(--box_shadow);
+	top: 20px;
+	left: 20px;
+	cursor: pointer;
+	z-index: 1000;
+	font-size: 12px;
+}
