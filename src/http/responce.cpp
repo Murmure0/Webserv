@@ -89,9 +89,10 @@ std::string responce::geterate_responce()
 	if (_method == "POST")
 	{
 		cgi = cgi_execute();
-		std::cout << "CGI == " << cgi << std::endl;
 		if (cgi.empty())
 			return generate_get_responce(_config.error_pages["500"], "HTTP/1.1", "500 Internal Server Error", "text/html", true);
+		if (cgi == "404")
+			return generate_get_responce(_config.error_pages["404"], "HTTP/1.1", "404 Not Found", "text/html", true);
 		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
 		// voir quand utilisé le code status 201 Created, qd on a cree un fichier avec POST
 	}
@@ -103,11 +104,13 @@ std::string responce::geterate_responce()
 			return generate_get_responce(_config.error_pages["404"], "HTTP/1.1", "404 Not Found", "text/html", true);
 		return generate_auto_index(_config.path, _config.url);
 	}
-	if (_config.path.find("?") != std::string::npos || _config.path.find(".py") != std::string::npos)
+	if (_config.path.find(".pr") != std::string::npos || _config.path.find(".py") != std::string::npos || _config.path.find(".php") != std::string::npos)
 	{
 		cgi = cgi_execute();
 		if (cgi.empty())
 			return generate_get_responce(_config.error_pages["500"], "HTTP/1.1", "500 Internal Server Error", "text/html", true);
+		if (cgi == "404")
+			return generate_get_responce(_config.error_pages["404"], "HTTP/1.1", "404 Not Found", "text/html", true);
 		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
 	}
 	return generate_get_responce(_config.path, "HTTP/1.1", "200 OK", _current_mime);

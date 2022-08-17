@@ -25,12 +25,17 @@ void request_config::set_url(std::string url)
    std::cout << "||URL is : " << _url << "||" <<std::endl;
 }
 
+void request_config::set_v_http(std::string http)
+{
+    _v_http = http; 
+   std::cout << "||http is : " << _url << "||" <<std::endl;
+}
+
 void request_config::set_content_length(size_t content_lgt)
 {
     _content_length = content_lgt;
-   std::cout << "||Content lenght is : " << _content_length << "||" <<std::endl;
+  std::cout << "||Content lenght is : " << _content_length << "||" <<std::endl;
 }
-
 
 
 std::string request_config::get_methode(void) const {
@@ -41,6 +46,11 @@ std::string request_config::get_url(void) const{
     return this->_url;
 }
 
+std::string request_config::get_v_http(void) const{
+    return this->_v_http;
+}
+
 size_t request_config::get_content_length(void) const{
     return this->_content_length;
 }
+
