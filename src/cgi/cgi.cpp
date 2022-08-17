@@ -116,17 +116,21 @@ char		**responce::vec_to_char(std::vector<std::string> vec_env)
 	return env;
 }
 
-std::string	responce::find_the_shebang_line(std::string script)
+std::string	responce::find_the_shebang_line()
 {
 	std::map<std::string, std::string>	map;
 	std::string							tmp;
 
-	tmp = script.substr(script.rfind("."));
+	tmp = "cgi-bin" + _config.path.substr(_config.path.rfind("/"));
+	if (tmp.find("?") != std::string::npos)
+		tmp.erase(tmp.find("?"));
+	tmp = tmp.substr(tmp.rfind("."));
 
 	map.insert(std::make_pair(".py", "/usr/bin/python3"));
 	map.insert(std::make_pair(".php", "/usr/bin/php"));
 	map.insert(std::make_pair(".pr", "/usr/bin/perl"));
-
+	if (map.find(tmp) == map.end())
+		return "";
 	return map.find(tmp)->second;
 }
 
@@ -145,11 +149,9 @@ void	responce::child_process(int *fd_in, int *fd_out, char **env)
 	char *av[3];
 	std::string	tmp = "cgi-bin" + _config.path.substr(_config.path.rfind("/"));
 	if (tmp.find("?") != std::string::npos)
-	{
 		tmp.erase(tmp.find("?"));
-	}
 	///For The moment we manage the python/php/pearl langage
-	std::string shebang_line = find_the_shebang_line(tmp);
+	std::string shebang_line = find_the_shebang_line();
 
 	av[0] = (char *)shebang_line.c_str();
 	av[1] = (char *)tmp.c_str();
@@ -177,14 +179,31 @@ std::string	responce::parent_process(pid_t pid, int *fd_out, int status)
 	return str_return;
 }
 
+bool	responce::file_existe()
+{
+	std::string	path = _config.path.substr(_config.path.rfind('/'));
+
+	if (path.find("?") != std::string::npos)
+		path.erase(path.find("?"));
+	std::ifstream	infile("cgi-bin" + path);
+	if (infile.good())
+		return 1;
+	return 0;
+}
+
 std::string	responce::cgi_execute()
 {
-	char	**env = vec_to_char(cgi_env());
-	int		fd_in[2]; //body
-	int		fd_out[2]; //family
-	pid_t	pid;
-	int		status = 0;
+	char		**env;
+	int			fd_in[2]; //body
+	int			fd_out[2]; //family
+	pid_t		pid;
+	int			status = 0;
 
+	if (!file_existe())
+		return "404";
+	if (find_the_shebang_line().empty())
+		return "";
+	env = vec_to_char(cgi_env());
 	if (pipe(fd_in) == -1)
 		return "";
 	if(pipe(fd_out) == -1)
@@ -192,11 +211,8 @@ std::string	responce::cgi_execute()
 	pid = fork();
 	if (pid == -1)
 		return "";
-
 	else if (pid == 0)
-	{
 		child_process(fd_in, fd_out, env);
-	}
 	if (dup2(fd_in[0], 0) == -1)
 		return "";
 	if (_header.at("Method:") == "POST")
