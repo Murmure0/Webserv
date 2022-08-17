@@ -18,7 +18,7 @@ responce::responce(std::string header, std::string body, std::string addr, size_
 	ext = _config.path.substr(_config.path.find_last_of("/"));
 	if (ext.find(".") != std::string::npos)
 	{
-		ext = ext.substr(ext.find(".") + 1);
+		ext = ext.substr(ext.find_last_of(".") + 1);
 		if (ext.size() && _mime->find(ext) != _mime->end())
 			_current_mime = (*_mime->find(ext)).second;
 		else
@@ -88,7 +88,6 @@ std::string responce::geterate_responce()
 
 	if (_method == "POST")
 	{
-		std::cout << "hey !" << _body << std::endl;
 		cgi = cgi_execute();
 		if (cgi.empty())
 			return generate_get_responce(_config.error_pages["500"], "HTTP/1.1", "500 Internal Server Error", "text/html", true);
@@ -114,6 +113,7 @@ std::string responce::geterate_responce()
 			return generate_get_responce(_config.error_pages["404"], "HTTP/1.1", "404 Not Found", "text/html", true);
 		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
 	}
+	_config.path = _config.path.substr(0, _config.path.find("?"));
 	return generate_get_responce(_config.path, "HTTP/1.1", "200 OK", _current_mime);
 };
 

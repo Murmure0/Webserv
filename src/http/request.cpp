@@ -101,7 +101,7 @@ int request::read_and_append(int fd)
 		_body += std::string(buffer, bytes_read);
 	}
 	// std::cout << _body.size() << std::endl;
-	if (_body.size() >= _content_size || _body.find("\r\n"))
+	if (_body.size() >= _content_size)
 	{
 		_request_completed = true;
 

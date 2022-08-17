@@ -628,6 +628,8 @@ t_responce_config webserv::generate_config(std::string host, std::string path, s
 
 	// get location that match with path if exist
 	path = urlDecode(path);
+	std::string save_path = path;
+	path = path.substr(0, path.find("?"));
 	location *loc = selected->get_location(path);
 	t_responce_config config;
 	config.url = path;
@@ -666,6 +668,12 @@ t_responce_config webserv::generate_config(std::string host, std::string path, s
 	}
 	config.header = header;
 	// std::cout << config.error_pages["404"] << std::endl;
+	//std::cout << config.index << std::endl;
+
+
+	if (save_path.find("?") != std::string::npos)
+		config.path = config.path + save_path.substr(save_path.find("?"));
+
 	return config;
 }
 
@@ -705,7 +713,6 @@ std::map<std::string, std::string> set_errors(std::map<std::string, std::string>
 		for (std::map<std::string, std::string>::iterator i = (*location_errors).begin(); i != (*location_errors).end(); i++)
 			errors[(*i).first] = (*i).second;
 	}
-
 	return errors;
 }
 
