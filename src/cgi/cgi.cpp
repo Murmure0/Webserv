@@ -134,6 +134,19 @@ std::string	responce::find_the_shebang_line()
 	return map.find(tmp)->second;
 }
 
+std::string	responce::find_the_shebang_line(std::string script)
+{
+	std::map<std::string, std::string>	map;
+	std::string							tmp;
+
+	tmp = script.substr(script.rfind("."));
+
+	map.insert(std::make_pair(".py", "/usr/bin/python3"));
+	map.insert(std::make_pair(".php", "/usr/bin/php"));
+	map.insert(std::make_pair(".pr", "/usr/bin/perl"));
+
+	return map.find(tmp)->second;
+}
 
 void	responce::child_process(int *fd_in, int *fd_out, char **env)
 {
@@ -151,7 +164,7 @@ void	responce::child_process(int *fd_in, int *fd_out, char **env)
 	if (tmp.find("?") != std::string::npos)
 		tmp.erase(tmp.find("?"));
 	///For The moment we manage the python/php/pearl langage
-	std::string shebang_line = find_the_shebang_line();
+	std::string shebang_line = find_the_shebang_line(tmp);
 
 	av[0] = (char *)shebang_line.c_str();
 	av[1] = (char *)tmp.c_str();
