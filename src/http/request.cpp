@@ -116,9 +116,13 @@ int request::read_and_append(int fd)
 		_body += std::string(buffer, bytes_read);
 	}
 	// std::cout << _body.size() << std::endl;
-	if (_body.size() == _content_size)
+	if (_body.size() == _content_size || _body.find("\r\n"))
 	{
 		_request_completed = true;
+
+		if (_body.size() != _content_size) {
+			// _error = 400
+		}
 		// std::cout << _header << std::endl;
 	}
 	return 0;

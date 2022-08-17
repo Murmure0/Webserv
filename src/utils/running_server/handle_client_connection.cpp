@@ -60,7 +60,7 @@ int webserv::handle_client_connection(void)
 
 		// struct timeval tv used for the timeout in select()
 		struct timeval tv;
-		tv.tv_sec = 8;
+		tv.tv_sec = 1;
 		tv.tv_usec = 0;
 
 		/* select() examines the I/O descriptor sets whose addresses are passed in
