@@ -15,15 +15,17 @@ class request_config
     void set_url(std::string url);
     void set_host(std::string host);
     void set_port(size_t port);
-    void set_content_lenght(size_t content_lgt);
+    void set_content_length(size_t content_lgt);
 
+    std::string get_methode(void) const;
+    std::string get_url(void) const;
+    size_t get_content_length(void) const;
 
     private:
     std::string _methode; //methode implementee ? permise a cet endroit ?
     std::string _url; //check si c'est trop long ? quelle limite ?
-    size_t      _content_lenght; //ds le cas d'un requete POST : doit etre present & ne doit pas etre + grand que precisé dans le fichier de config
-    std::string _host; // ?
-    size_t      _port; // ?
+    size_t      _content_length; //ds le cas d'un requete POST : doit etre present & ne doit pas etre + grand que precisé dans le fichier de config
+    
 
     
 };

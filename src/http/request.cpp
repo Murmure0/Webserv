@@ -41,20 +41,33 @@ void request::set_request_config()
 	std::cout << std::endl;
 	std::cout << "In request config : " << std::endl;
 	size_t methode_pos = _header.find("/");
-	std::string meth = _header.substr(0, methode_pos - 1);
+	std::string meth;
+	if(methode_pos == std::string::npos)
+		meth = _header.substr(0);
+	else
+		meth = _header.substr(0, methode_pos - 1);
 	_request_config.set_methode(meth);
 
 	size_t url_pos = _header.find("http");
 	std::string pre_url = _header.substr(url_pos);
+
 	size_t end_url_pos = pre_url.find("\n");
-	std::string url = pre_url.substr(0, end_url_pos - 1);
+	std::string url;
+	if (end_url_pos == std::string::npos)
+		url = pre_url.substr(0);
+	else
+		url = pre_url.substr(0, end_url_pos - 1);
 	_request_config.set_url(url);
 
-	_request_config.set_content_lenght(this->get_content_size());
+	_request_config.set_content_length(this->get_content_size());
 
-	// _request_config.set_host();
-	// _request_config.set_port();
 	std::cout << std::endl;
+}
+
+std::string request::check_request_config(void) const
+{
+	if (this->_request_config.get_content_length() < 0 && this->_request_config.get_methode() == "POST")
+		return ("400"); //Content-Length header field having an invalid value
 }
 
 void request::clear(void)
@@ -93,7 +106,9 @@ int request::read_and_append(int fd)
 			config_content_size(_header);
 			// std::cout << "XXX|"<< _header << "|XXX"<< std::endl;
 			// fill request_config
-			// set_request_config();
+			set_request_config();
+			_error = check_request_config();
+			//check d'erreur, si pb : set _error_page a la str du nb de l'erreur
 		}
 	}
 	else

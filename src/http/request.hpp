@@ -25,6 +25,7 @@ public:
 	std::string get_body(void) const;
 	std::string get_addr_ip(void) const;
 	void set_request_config(void);
+	std::string check_request_config(void) const;
 
 	/*
 	get string between host: and the next space
@@ -46,6 +47,7 @@ private:
 	bool _header_completed;
 	bool _request_completed;
 	request_config _request_config;
+	std::string	_error;
 };
 
 #endif // REQUEST_H

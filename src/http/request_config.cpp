@@ -4,10 +4,7 @@ request_config::request_config()
 {
     _methode = "";
     _url = "";
-    _host = "";
-    _port = 0;
-    _content_lenght = 0;
-
+    _content_length = -1;
 }
 
 request_config::~request_config()
@@ -18,30 +15,32 @@ request_config::~request_config()
 void request_config::set_methode(std::string meth)
 {
     _methode = meth;
-   // std::cout << "||Methode is : " << _methode << "||" <<std::endl;
+   std::cout << "||Methode is : " << _methode << "||" <<std::endl;
 }
 
 
 void request_config::set_url(std::string url)
 {
     _url = url; 
-   // std::cout << "||URL is : " << _url << "||" <<std::endl;
+   std::cout << "||URL is : " << _url << "||" <<std::endl;
 }
 
-void request_config::set_host(std::string host)
+void request_config::set_content_length(size_t content_lgt)
 {
-    _host = host;
-   //std::cout << "||host is : " << _host << "||" <<std::endl;
+    _content_length = content_lgt;
+   std::cout << "||Content lenght is : " << _content_length << "||" <<std::endl;
 }
 
-void request_config::set_port(size_t port)
-{
-    _port = port;
-   // std::cout << "||port is : " << _port << "||" <<std::endl;
+
+
+std::string request_config::get_methode(void) const {
+    return this->_methode;
 }
 
-void request_config::set_content_lenght(size_t content_lgt)
-{
-    _content_lenght = content_lgt;
-   // std::cout << "||Content lenght is : " << _content_lenght << "||" <<std::endl;
+std::string request_config::get_url(void) const{
+    return this->_url;
+}
+
+size_t request_config::get_content_length(void) const{
+    return this->_content_length;
 }

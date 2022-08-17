@@ -61,6 +61,7 @@ private:
 	std::string parent_process(pid_t pid, int *fd_out, int status);
 	char **vec_to_char(std::vector<std::string> vec_env);
 	std::string find_the_shebang_line(std::string script);
+	std::string	_error;
 
 	/// essais
 	size_t _contentlenght;
