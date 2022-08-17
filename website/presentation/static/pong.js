@@ -35,7 +35,7 @@ const random_ball = () => {
 const touch_player = (player, player_y, computer_y, ball_angle) => {
 	const x = player == "player" ? 0 : 670;
 	const c_pos = player == "player" ? player_y : computer_y;
-	const abstract = ball_angle < Math.PI / 2;
+	const abstract = ((ball_angle + Math.PI) > Math.PI / 2) && (ball_angle + Math.PI < Math.PI / 2 * 3);
 	if (abstract && player == "player") {
 		return false;
 	}
@@ -44,7 +44,7 @@ const touch_player = (player, player_y, computer_y, ball_angle) => {
 		return false;
 	}
 
-	return (ball_x >= x && ball_x <= x + 30) && (ball_y >= c_pos && ball_y <= c_pos + 70);
+	return (ball_x >= x && ball_x <= x + 30) && (ball_y >= c_pos - 5 && ball_y <= c_pos + 65);
 }
 
 const move_ball = () => {
@@ -127,6 +127,7 @@ const loop = () => {
 	move_ball();
 	if (touch_player("player", player_y, computer_y, ball_angle)) {
 		ball_angle = Math.PI - ball_angle;
+		console.log("ret")
 	}
 	if (touch_player("computer", player_y, computer_y, ball_angle)) {
 		ball_angle = Math.PI - ball_angle;
