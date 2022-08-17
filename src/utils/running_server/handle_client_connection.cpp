@@ -149,6 +149,8 @@ int webserv::handle_client_connection(void)
 				if ((*i).second.is_sent())
 				{
 					open_responces.erase(i);
+					FD_CLR((*i).first, &current_sockets);
+					close((*i).first);
 					break;
 				}
 			}
@@ -159,21 +161,12 @@ int webserv::handle_client_connection(void)
 		{
 			if (FD_ISSET((*i).first, &ready_read_sockets))
 			{
-				int ret = (*i).second.read_and_append((*i).first);
-				if (ret < 0)
-				{
-					std::cout << "need close" << std::endl;
-					open_requests.erase(i);
-					open_responces.erase((*i).first);
-					FD_CLR((*i).first, &current_sockets);
-					close((*i).first);
-					break;
-				}
+				(*i).second.read_and_append((*i).first);
 				if ((*i).second.is_completed())
 				{
 					//si request._error_page est set a une valeur, set la response.error_page 
 					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(), (*i).second.get_addr_ip(), (*i).second.get_content_size(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path(), (*i).second.get_header()));
-					open_requests[(*i).first].clear();
+					open_requests.erase(i);
 					break;
 				}
 			}

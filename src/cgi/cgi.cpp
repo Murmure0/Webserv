@@ -52,7 +52,7 @@ std::vector<std::string>	responce::cgi_env()
 	///PATH_INFO:Extra path information passed to a CGI program.
 	///TO DO voir si pas un probleme avec le testeur de l'école mais pour le moment ça suit la RFC
 	if (_header.at("Method:") == "GET")
-		env.push_back("PATH_INFO=" + _config.url.substr(_config.url.find("?") + 1));
+		env.push_back("PATH_INFO=" + _config.path.substr(_config.path.find("?") + 1));
 	else
 		env.push_back("PATH_INFO=");
 
@@ -60,12 +60,12 @@ std::vector<std::string>	responce::cgi_env()
 	env.push_back(std::string ("PATH_TRANSLATE=") + tmp_path + "/" + _config.path.substr(2));
 
 	if (_header.at("Method:") == "GET")
-		env.push_back("SCRIPT_NAME=" + _config.url.substr(0, _config.url.find("?")));
+		env.push_back("SCRIPT_NAME=" + _config.path.substr(0, _config.path.find("?")));
 	else
-		env.push_back("SCRIPT_NAME=" + _config.url.substr(0));
+		env.push_back("SCRIPT_NAME=" + _config.path.substr(0));
 
-	if (_config.url.find("?") != std::string::npos)
-		env.push_back("QUERY_STRING=" + _config.url.substr(_config.url.find("?") + 1));
+	if (_config.path.find("?") != std::string::npos)
+		env.push_back("QUERY_STRING=" + _config.path.substr(_config.path.find("?") + 1));
 
 	env.push_back("REMOTE_HOST=");
 
@@ -78,7 +78,6 @@ std::vector<std::string>	responce::cgi_env()
 		env.push_back("CONTENT_LENGTH=");
 
 	env.push_back("HTTP_ACCEPT=" + _header.at("Accept:"));
-
 
 	env.push_back("HTTP_ACCEPT_LANGUAGE=" + _header.at("Accept-Language:"));
 
@@ -93,8 +92,7 @@ std::vector<std::string>	responce::cgi_env()
 	env.push_back("REMOTE_USER=");
 
 
-	if (_header.find("Cookie:") != _header.end())
-		env.push_back("HTTP_COOKIE=" + _header.at("Cookie:"));
+	env.push_back("HTTP_COOKIE=" + _header.at("Cookie:"));
 
 	return env;
 }
@@ -134,6 +132,19 @@ std::string	responce::find_the_shebang_line()
 	return map.find(tmp)->second;
 }
 
+std::string	responce::find_the_shebang_line(std::string script)
+{
+	std::map<std::string, std::string>	map;
+	std::string							tmp;
+
+	tmp = script.substr(script.rfind("."));
+
+	map.insert(std::make_pair(".py", "/usr/bin/python3"));
+	map.insert(std::make_pair(".php", "/usr/bin/php"));
+	map.insert(std::make_pair(".pr", "/usr/bin/perl"));
+
+	return map.find(tmp)->second;
+}
 
 void	responce::child_process(int *fd_in, int *fd_out, char **env)
 {
@@ -151,7 +162,7 @@ void	responce::child_process(int *fd_in, int *fd_out, char **env)
 	if (tmp.find("?") != std::string::npos)
 		tmp.erase(tmp.find("?"));
 	///For The moment we manage the python/php/pearl langage
-	std::string shebang_line = find_the_shebang_line();
+	std::string shebang_line = find_the_shebang_line(tmp);
 
 	av[0] = (char *)shebang_line.c_str();
 	av[1] = (char *)tmp.c_str();
@@ -199,7 +210,8 @@ std::string	responce::cgi_execute()
 	pid_t		pid;
 	int			status = 0;
 
-	if (!file_existe())
+	(void)env;
+	if (!file_existe() || _body.empty())
 		return "404";
 	if (find_the_shebang_line().empty())
 		return "";
