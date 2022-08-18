@@ -108,7 +108,7 @@ std::string responce::geterate_responce()
 			return generate_get_responce(_config.error_pages["404"], "HTTP/1.1", "404 Not Found", "text/html", true);
 		return generate_auto_index(_config.path, _config.url);
 	}
-	if (_config.path.find(".pr") != std::string::npos || _config.path.find(".py") != std::string::npos || _config.path.find(".php") != std::string::npos)
+	if (_config.path.find(".pl") != std::string::npos || _config.path.find(".py") != std::string::npos || _config.path.find(".php") != std::string::npos)
 	{
 		cgi = cgi_execute();
 		if (cgi.empty())
