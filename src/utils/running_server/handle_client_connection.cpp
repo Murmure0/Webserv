@@ -166,7 +166,6 @@ int webserv::handle_client_connection(void)
 				}
 				if ((*i).second.is_completed())
 				{
-					//si request._error_page est set a une valeur, set la response.error_page 
 					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(), (*i).second.get_addr_ip(), (*i).second.get_content_size(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path(), (*i).second.get_header()));
 					open_responces[(*i).first].set_error(open_requests[(*i).first].get_error());
 					open_requests.erase(i);
