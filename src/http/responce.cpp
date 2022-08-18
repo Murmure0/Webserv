@@ -149,14 +149,14 @@ std::string responce::generate_auto_index(std::string path, std::string url)
 	return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(ret_str.length()) + "\nContent-Type: text/html\r\n\r\n" + ret_str + "\r\n";
 }
 
-std::string responce::generate_get_responce(std::string path, std::string http_version, std::string status, std::string mime, bool not_fail) const
+std::string responce::generate_get_responce(std::string path, std::string http_version, std::string status, std::string mime, bool not_fail)
 {
 	(void)mime;
 	std::ifstream infile(path.c_str());
 
 	if (!not_fail && !infile.good())
 	{
-		return generate_get_responce("./default_error_pages/404.html", "HTTP/1.1", "404 Not Found", "text/html", true);
+		return generate_get_responce(_config.error_pages["404"], "HTTP/1.1", "404 Not Found", "text/html", true);
 	}
 
 	std::stringstream ss;

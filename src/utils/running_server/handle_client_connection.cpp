@@ -126,8 +126,7 @@ int webserv::handle_client_connection(void)
 			}
 			open_requests.erase(open_requests.begin(), open_requests.end());
 		}
-
-		// /!\/!\/!\/!\ Zone en chantier :
+		
 		// loop on open_responces to send a small part of the response to each client simultaneously
 		for (std::map<int, responce>::iterator i = open_responces.begin(); i != open_responces.end(); i++)
 		{

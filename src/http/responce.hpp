@@ -32,7 +32,7 @@ public:
 	/*
 	generate a standard get responce if ressource exist. If not return a 404 error page.
 	*/
-	std::string generate_get_responce(std::string path, std::string http_version, std::string status, std::string mime, bool not_fail = false) const;
+	std::string generate_get_responce(std::string path, std::string http_version, std::string status, std::string mime, bool not_fail = false) ;
 
 	void set_responce(std::string responce);
 
