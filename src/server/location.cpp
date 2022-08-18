@@ -6,7 +6,7 @@ location::location(void)
 {
 	this->_autoindex = false;
 	this->_autoindex_set = false;
-	this->_max_body_size = -1;
+	this->_max_body_size = 0;
 }
 
 location::~location(void)

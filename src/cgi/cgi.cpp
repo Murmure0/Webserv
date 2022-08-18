@@ -211,7 +211,7 @@ std::string	responce::cgi_execute()
 	int			status = 0;
 
 	(void)env;
-	if (!file_existe() || _body.empty())
+	if (!file_existe() || (_body.empty() && _method == "POST"))
 		return "404";
 	if (find_the_shebang_line().empty())
 		return "";
