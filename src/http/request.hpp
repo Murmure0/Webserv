@@ -28,7 +28,7 @@ public:
 	std::string get_addr_ip(void) const;
 	void set_request_config(void);
 	std::string check_request_config(void) const;
-
+	void clear(void);
 	/*
 	get string between host: and the next space
 	this string look like: localhost:4040

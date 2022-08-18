@@ -41,8 +41,8 @@ void request::config_content_size(std::string header)
 
 void request::set_request_config()
 {
-	std::cout << std::endl;
-	std::cout << "In request config : " << std::endl;
+	//std::cout << std::endl;
+	//std::cout << "In request config : " << std::endl;
 	/* Setting the METHODE*/
 	size_t methode_pos = _header.find("/");
 	std::string meth;
@@ -53,16 +53,15 @@ void request::set_request_config()
 	_request_config.set_methode(meth);
 
 	/* Setting URL*/
-	size_t url_pos = _header.find("http");
-	std::string pre_url = _header.substr(url_pos);
+	size_t url_pos = _header.find(" ");
+	if (url_pos != std::string::npos)
+	{
+		std::string pre_url = _header.substr(url_pos + 1);
 
-	size_t end_url_pos = pre_url.find("\n");
-	std::string url;
-	if (end_url_pos == std::string::npos)
-		url = pre_url.substr(0);
-	else
-		url = pre_url.substr(0, end_url_pos - 1);
-	_request_config.set_url(url);
+		size_t end_url_pos = pre_url.find("HTTP");
+		std::string url = pre_url.substr(0, end_url_pos - 1);
+		_request_config.set_url(url);
+	}
 
 	/* Setting CONTENT_SIZE*/
 	_request_config.set_content_length(this->get_content_size());
@@ -72,26 +71,30 @@ void request::set_request_config()
 	std::string pre_http = _header.substr(http_pos);
 
 	size_t end_http = pre_http.find("\n");
-	std::string v_http = pre_http.substr(0, end_http);
+	std::string v_http;
+	if (end_http != std::string::npos)
+		v_http = pre_http.substr(0, end_http - 1);
+	else
+		v_http = pre_http.substr(0, end_http);
 	_request_config.set_v_http(v_http);
 
-	std::cout << std::endl;
+	//std::cout << std::endl;
 }
 
 std::string request::check_request_config(void) const
 {
 	if (_request_config.get_content_length() < 0 && _body.size() != _content_size)
-		return ("400"); //Content-Length header field having an invalid value
+		return ("400 Bad Request"); //Content-Length header field having an invalid value
 	else if (_request_config.get_methode() == "POST" && _request_config.get_content_length() < 0)
-		return ("411"); // rrequest is POST and don't have amy content length
+		return ("411 Length Required"); // rrequest is POST and don't have amy content length
 	else if (_request_config.get_url() == "")
-		return ("400"); //pas d'url fournie
-	else if (_request_config.get_url().length() > 8000)
-		return ("414"); //URI Too Long
+		return ("400 Bad Request"); //pas d'url fournie
+	else if (_request_config.get_url().length() > 8096)
+		return ("414 URI Too Long"); //URI Too Long
 	else if (_request_config.get_methode() != "POST" && _request_config.get_methode() != "GET" && _request_config.get_methode() != "DELETE")
-		return ("501"); //methode not implemented
+		return ("501 Not Implemented"); //methode not implemented
 	else if (_request_config.get_v_http() != "HTTP/1.1")
-		return("505"); //http version not supported
+		return("505 HTTP Version Not Supported"); //http version not supported
 	else
 		return "";
 }
@@ -129,13 +132,10 @@ int request::read_and_append(int fd)
 			_body = _header.substr(_header.find("\r\n\r\n") + 4);
 			_header = _header.substr(0, _header.find("\r\n\r\n"));
 			config_content_size(_header);
-<<<<<<< HEAD
-			//std::cout << "XXX|"<< _header << "|XXX"<< std::endl;
+			std::cout << "XXX|"<< _header << "|XXX"<< std::endl;
 			// fill request_config
-			//set_request_config();
-=======
-			// set_request_config();
->>>>>>> 5f51d9e0b4f6e7c7f149d52544a89bb2a71b3971
+			set_request_config();
+			std::cout << _request_config.get_url().length() << "|" << std::endl;
 		}
 	}
 	else
@@ -145,13 +145,11 @@ int request::read_and_append(int fd)
 	if (_body.size() >= _content_size)
 	{
 		_request_completed = true;
-<<<<<<< HEAD
 
 
-	//	_error = this->check_request_config();
+		_error = this->check_request_config();
+		//std::cout << _error << std::endl;
 		// std::cout << _header << std::endl;
-=======
->>>>>>> 5f51d9e0b4f6e7c7f149d52544a89bb2a71b3971
 	}
 	return 0;
 }

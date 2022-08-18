@@ -15,7 +15,7 @@ request_config::~request_config()
 void request_config::set_methode(std::string meth)
 {
     _methode = meth;
-   std::cout << "||Methode is : " << _methode << "||" <<std::endl;
+   //std::cout << "||Methode is : " << _methode << "||" <<std::endl;
 }
 
 
@@ -28,13 +28,13 @@ void request_config::set_url(std::string url)
 void request_config::set_v_http(std::string http)
 {
     _v_http = http; 
-   std::cout << "||http is : " << _url << "||" <<std::endl;
+   //std::cout << "||http is : " << _url << "||" <<std::endl;
 }
 
 void request_config::set_content_length(size_t content_lgt)
 {
     _content_length = content_lgt;
-  std::cout << "||Content lenght is : " << _content_length << "||" <<std::endl;
+    //std::cout << "||Content lenght is : " << _content_length << "||" <<std::endl;
 }
 
 
