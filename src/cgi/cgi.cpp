@@ -77,13 +77,17 @@ std::vector<std::string>	responce::cgi_env()
 	else
 		env.push_back("CONTENT_LENGTH=");
 
-	env.push_back("HTTP_ACCEPT=" + _header.at("Accept:"));
+	if (_header.find("Accept:") != _header.end())
+		env.push_back("HTTP_ACCEPT=" + _header.at("Accept:"));
 
-	env.push_back("HTTP_ACCEPT_LANGUAGE=" + _header.at("Accept-Language:"));
+	if (_header.find("Accept-Language:") != _header.end())
+		env.push_back("HTTP_ACCEPT_LANGUAGE=" + _header.at("Accept-Language:"));
 
-	env.push_back("HTTP_USER_AGENT=" + _header.at("User-Agent:"));
+	if (_header.find("User-Agent:") != _header.end())
+		env.push_back("HTTP_USER_AGENT=" + _header.at("User-Agent:"));
 
-	env.push_back("HTTP_REFERER=" + _header.at("Referer:"));
+	if (_header.find("Referer:") != _header.end())
+		env.push_back("HTTP_REFERER=" + _header.at("Referer:"));
 
 	env.push_back("REMOTE_ADDR=" + _addr_ip);
 
@@ -91,9 +95,8 @@ std::vector<std::string>	responce::cgi_env()
 
 	env.push_back("REMOTE_USER=");
 
-
-	env.push_back("HTTP_COOKIE=" + _header.at("Cookie:"));
-
+	if (_header.find("Cookie:") != _header.end())
+		env.push_back("HTTP_COOKIE=" + _header.at("Cookie:"));
 	return env;
 }
 
@@ -126,7 +129,7 @@ std::string	responce::find_the_shebang_line()
 
 	map.insert(std::make_pair(".py", "/usr/bin/python3"));
 	map.insert(std::make_pair(".php", "/usr/bin/php"));
-	map.insert(std::make_pair(".pr", "/usr/bin/perl"));
+	map.insert(std::make_pair(".pl", "/usr/bin/perl"));
 	if (map.find(tmp) == map.end())
 		return "";
 	return map.find(tmp)->second;
@@ -141,7 +144,7 @@ std::string	responce::find_the_shebang_line(std::string script)
 
 	map.insert(std::make_pair(".py", "/usr/bin/python3"));
 	map.insert(std::make_pair(".php", "/usr/bin/php"));
-	map.insert(std::make_pair(".pr", "/usr/bin/perl"));
+	map.insert(std::make_pair(".pl", "/usr/bin/perl"));
 
 	return map.find(tmp)->second;
 }
@@ -196,6 +199,8 @@ bool	responce::file_existe()
 
 	if (path.find("?") != std::string::npos)
 		path.erase(path.find("?"));
+	if (path == "/" || path.find(".") == std::string::npos)
+		return 0;
 	std::ifstream	infile("cgi-bin" + path);
 	if (infile.good())
 		return 1;
@@ -205,13 +210,13 @@ bool	responce::file_existe()
 std::string	responce::cgi_execute()
 {
 	char		**env;
-	int			fd_in[2]; //body
-	int			fd_out[2]; //family
+	int			fd_in[2];
+	int			fd_out[2];
 	pid_t		pid;
 	int			status = 0;
 
 	(void)env;
-	if (!file_existe() || _body.empty())
+	if (!file_existe() || (_body.empty() && _method == "POST"))
 		return "404";
 	if (find_the_shebang_line().empty())
 		return "";

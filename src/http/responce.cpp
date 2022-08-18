@@ -65,6 +65,10 @@ std::string responce::geterate_responce()
 		return "HTTP/1.1 " + code + " Moved Permanently" + "\n" + "Location: " + url + "\n\r\n\r\n\r";
 	}
 
+	if (_config.max_body_size < _body.length() && _config.max_body_size != 0) {
+		return generate_get_responce(_config.error_pages["413"], "HTTP/1.1", "413 Request Entity Too Large", "text/html", true);
+	}
+
 	if (all_methods.find(_method) == std::string::npos || _method.find_first_of("|") != std::string::npos)
 	{
 		return generate_get_responce(_config.error_pages["501"], "HTTP/1.1", "501 Not Implemented Error", "text/html", true);
@@ -81,7 +85,7 @@ std::string responce::geterate_responce()
 		int status;
 		status = remove(_config.path.c_str());
 		if (status == 0)
-			return "HTTP/1.1 200 OK\nContent-Length: 0\r\n\r\n\r\n";
+			return "HTTP/1.1 204 No Content\nContent-Length: 0\r\n\r\n\r\n";
 		else
 			return generate_get_responce(_config.error_pages["404"], "HTTP/1.1", "404 Not Found", "text/html", true);
 	}
@@ -93,8 +97,7 @@ std::string responce::geterate_responce()
 			return generate_get_responce(_config.error_pages["500"], "HTTP/1.1", "500 Internal Server Error", "text/html", true);
 		if (cgi == "404")
 			return generate_get_responce(_config.error_pages["404"], "HTTP/1.1", "404 Not Found", "text/html", true);
-		return "HTTP/1.1 200 OK\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
-		// voir quand utilisé le code status 201 Created, qd on a cree un fichier avec POST
+		return "HTTP/1.1 201 Created\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
 	}
 
 	// check if ask for auto index or return statdard get responce
@@ -104,7 +107,7 @@ std::string responce::geterate_responce()
 			return generate_get_responce(_config.error_pages["404"], "HTTP/1.1", "404 Not Found", "text/html", true);
 		return generate_auto_index(_config.path, _config.url);
 	}
-	if (_config.path.find(".pr") != std::string::npos || _config.path.find(".py") != std::string::npos || _config.path.find(".php") != std::string::npos)
+	if (_config.path.find(".pl") != std::string::npos || _config.path.find(".py") != std::string::npos || _config.path.find(".php") != std::string::npos)
 	{
 		cgi = cgi_execute();
 		if (cgi.empty())
@@ -159,7 +162,6 @@ std::string responce::generate_get_responce(std::string path, std::string http_v
 
 	// adding the minimal http header-ever to the file content:
 	str_resp = http_version + " " + status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + ss.str() + "\r\n";
-	// std::cout << ss.str().size() << std::endl;
 
 	infile.close();
 	return str_resp;
