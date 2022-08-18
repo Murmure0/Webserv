@@ -39,6 +39,7 @@ public:
 	get asked ressources
 	*/
 	std::string get_path(void) const;
+	std::string get_error(void) const;
 
 	size_t get_content_size(void) const;
 

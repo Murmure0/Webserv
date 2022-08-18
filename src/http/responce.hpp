@@ -41,6 +41,8 @@ public:
 	bool is_sent(void) const;
 
 	std::string get_response() { return _responce; }
+	
+	void set_error(std::string error) { _error = error; }
 
 private:
 	std::map<std::string, std::string> *_mime;
@@ -53,6 +55,7 @@ private:
 	std::string _body;
 	std::map<std::string, std::string> _header;
 	std::string _addr_ip;
+	std::string _error;
 
 	std::string cgi_execute();
 	std::vector<std::string> cgi_env();

@@ -22,7 +22,7 @@ void request_config::set_methode(std::string meth)
 void request_config::set_url(std::string url)
 {
     _url = url; 
-   std::cout << "||URL is : " << _url << "||" <<std::endl;
+   //std::cout << "||URL is : " << _url << "||" <<std::endl;
 }
 
 void request_config::set_v_http(std::string http)

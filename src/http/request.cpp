@@ -85,7 +85,7 @@ std::string request::check_request_config(void) const
 {
 	if (_request_config.get_content_length() < 0 && _body.size() != _content_size)
 		return ("400 Bad Request"); //Content-Length header field having an invalid value
-	else if (_request_config.get_methode() == "POST" && _request_config.get_content_length() < 0)
+	else if (_request_config.get_methode() == "POST" && (_request_config.get_content_length() == 0 && _header.find("Content-Length: 0") == std::string::npos))
 		return ("411 Length Required"); // rrequest is POST and don't have amy content length
 	else if (_request_config.get_url() == "")
 		return ("400 Bad Request"); //pas d'url fournie
@@ -132,10 +132,10 @@ int request::read_and_append(int fd)
 			_body = _header.substr(_header.find("\r\n\r\n") + 4);
 			_header = _header.substr(0, _header.find("\r\n\r\n"));
 			config_content_size(_header);
-			std::cout << "XXX|"<< _header << "|XXX"<< std::endl;
+			//std::cout << "XXX|"<< _header << "|XXX"<< std::endl;
 			// fill request_config
 			set_request_config();
-			std::cout << _request_config.get_url().length() << "|" << std::endl;
+			//std::cout << _request_config.get_url().length() << "|" << std::endl;
 		}
 	}
 	else
@@ -193,4 +193,9 @@ size_t request::get_content_size(void) const
 std::string request::get_addr_ip(void) const
 {
 	return this->_addr_ip;
+}
+
+std::string request::get_error(void) const
+{
+	return this->_error;
 }

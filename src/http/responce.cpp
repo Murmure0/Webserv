@@ -31,7 +31,7 @@ responce::responce(std::string header, std::string body, std::string addr, size_
 	_addr_ip = addr;
 };
 
-responce::responce(responce const &to_copy) : _mime(to_copy._mime), _config(to_copy._config), _current_mime(to_copy._current_mime), _method(to_copy._method), _sent(to_copy._sent) {}
+responce::responce(responce const &to_copy) : _mime(to_copy._mime), _config(to_copy._config), _current_mime(to_copy._current_mime), _method(to_copy._method), _sent(to_copy._sent), _error(to_copy._error) {}
 
 responce &responce::operator=(responce const &rhs)
 {
@@ -46,6 +46,7 @@ responce &responce::operator=(responce const &rhs)
 	this->_contentlenght = rhs._contentlenght;
 	this->_body = rhs._body;
 	this->_addr_ip = rhs._addr_ip;
+	this->_error = rhs._error;
 	return *this;
 }
 
@@ -56,6 +57,9 @@ std::string responce::geterate_responce()
 
 	if (_responce_ready)
 		return _responce;
+	if (!_error.empty()) {
+		return generate_get_responce(_config.error_pages[_error.substr(0, 3)], "HTTP/1.1", _error, "text/html", true);
+	}
 	if (!_config.redirect.empty())
 	{
 		std::string code = _config.redirect.substr(0, _config.redirect.find(" "));
