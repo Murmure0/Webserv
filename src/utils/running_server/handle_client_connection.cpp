@@ -69,7 +69,6 @@ int webserv::handle_client_connection(void)
 		  select() returns the total number of ready descriptors in all the sets. */
 		ret = select(FD_SETSIZE, &ready_read_sockets, &ready_write_sockets, NULL, &tv);
 
-		// Peut etre simplifiée :
 		if (ret < 0 || ret == 0) // error or timeout
 		{
 			if (ret < 0)
@@ -142,13 +141,11 @@ int webserv::handle_client_connection(void)
 
 				// sending to client :
 				// call new function in responce to get BUFFERSIZE each time
-				send((*i).first, str_resp.c_str(), len, 0);
-
+				int ret = send((*i).first, str_resp.c_str(), len, 0);
 				// erase responce
-				if ((*i).second.is_sent())
+				if ((*i).second.is_sent() || ret == -1)
 				{
 					open_responces.erase(i);
-					FD_CLR((*i).first, &current_sockets);
 					close((*i).first);
 					break;
 				}
@@ -160,13 +157,20 @@ int webserv::handle_client_connection(void)
 		{
 			if (FD_ISSET((*i).first, &ready_read_sockets))
 			{
-				(*i).second.read_and_append((*i).first);
+				int ret = (*i).second.read_and_append((*i).first);
+				if (ret == -1) {
+					open_requests.erase(i);
+					open_responces.erase((*i).first);
+					FD_CLR((*i).first, &current_sockets);
+					close((*i).first);
+				}
 				if ((*i).second.is_completed())
 				{
 					//si request._error_page est set a une valeur, set la response.error_page 
 					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(), (*i).second.get_addr_ip(), (*i).second.get_content_size(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path(), (*i).second.get_header()));
 					open_responces[(*i).first].set_error(open_requests[(*i).first].get_error());
 					open_requests.erase(i);
+					FD_CLR((*i).first, &current_sockets);
 					break;
 				}
 			}
