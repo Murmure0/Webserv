@@ -237,6 +237,8 @@ std::string	responce::cgi_execute()
 	close(fd_in[1]);
 	close(fd_in[0]);
 	close(fd_out[1]);
-
+	for (size_t i = 0; env[i]; i++)
+		delete env[i];
+	delete env;
 	return parent_process(pid, fd_out, status);
 }
