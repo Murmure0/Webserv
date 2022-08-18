@@ -210,8 +210,8 @@ bool	responce::file_existe()
 std::string	responce::cgi_execute()
 {
 	char		**env;
-	int			fd_in[2]; //body
-	int			fd_out[2]; //family
+	int			fd_in[2];
+	int			fd_out[2];
 	pid_t		pid;
 	int			status = 0;
 

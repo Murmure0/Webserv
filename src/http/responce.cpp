@@ -98,7 +98,6 @@ std::string responce::geterate_responce()
 		if (cgi == "404")
 			return generate_get_responce(_config.error_pages["404"], "HTTP/1.1", "404 Not Found", "text/html", true);
 		return "HTTP/1.1 201 Created\nContent-Length: " + ft_to_string(cgi.size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + cgi + "\r\n";
-		// voir quand utilisé le code status 201 Created, qd on a cree un fichier avec POST
 	}
 
 	// check if ask for auto index or return statdard get responce
@@ -163,7 +162,6 @@ std::string responce::generate_get_responce(std::string path, std::string http_v
 
 	// adding the minimal http header-ever to the file content:
 	str_resp = http_version + " " + status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + ss.str() + "\r\n";
-	// std::cout << ss.str().size() << std::endl;
 
 	infile.close();
 	return str_resp;

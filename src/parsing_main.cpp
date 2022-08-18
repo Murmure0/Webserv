@@ -10,7 +10,6 @@ void signal_handler(int signal_handle)
 {
 	std::cout << std::endl;
 	std::cout << "Goodbye." << std::endl;
-	std::cout << std::endl;
 
 	send_ws(NULL)->close_sockets();
 	exit(signal_handle);

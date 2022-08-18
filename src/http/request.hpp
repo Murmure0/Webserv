@@ -17,14 +17,17 @@ public:
 	/*
 	this function will fill the request object by reading BUFFER_SIZE by BUFFER_SIZE char on specific fd
 	*/
-
-	void clear(void);
 	int read_and_append(int fd);
+
+	/*
+	know if request is completed. Use to know when we need to create responce
+	*/
 	bool is_completed(void) const;
 	std::string get_header(void) const;
 	std::string get_body(void) const;
 	std::string get_addr_ip(void) const;
 	void set_request_config(void);
+	void clear(void);
 
 	/*
 	get string between host: and the next space

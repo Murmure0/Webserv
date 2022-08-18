@@ -85,14 +85,11 @@ int request::read_and_append(int fd)
 		_header += std::string(buffer, bytes_read);
 		if (_header.find("\r\n\r\n") != std::string::npos)
 		{
-			// std::cout << _header.substr(0, _header.find("\n") - 1) << std::endl;
 			// if end of header set header completed and add in body the part of body in the string we have (after /n/r/n/r)
 			_header_completed = true;
 			_body = _header.substr(_header.find("\r\n\r\n") + 4);
 			_header = _header.substr(0, _header.find("\r\n\r\n"));
 			config_content_size(_header);
-			// std::cout << "XXX|"<< _header << "|XXX"<< std::endl;
-			// fill request_config
 			// set_request_config();
 		}
 	}
@@ -100,15 +97,9 @@ int request::read_and_append(int fd)
 	{
 		_body += std::string(buffer, bytes_read);
 	}
-	// std::cout << _body.size() << std::endl;
 	if (_body.size() >= _content_size)
 	{
 		_request_completed = true;
-
-		if (_body.size() != _content_size) {
-			// _error = 400
-		}
-		// std::cout << _header << std::endl;
 	}
 	return 0;
 }
