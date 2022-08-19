@@ -8,8 +8,7 @@ webserv *send_ws(webserv *ws)
 
 void signal_handler(int signal_handle)
 {
-	std::cout << std::endl;
-	std::cout << "Goodbye." << std::endl;
+	bye();
 
 	send_ws(NULL)->close_sockets();
 	exit(signal_handle);
@@ -47,7 +46,7 @@ int main(int argc, char **argv)
 	}
 
 	// ws.print();
-
+	welcome();
 	ws.run();
 
 	return 0;

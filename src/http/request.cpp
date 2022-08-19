@@ -116,7 +116,7 @@ int request::read_and_append(int fd)
 	if (_request_completed)
 		return 0;
 	bytes_read = recv(fd, buffer, BUFFER_SIZE - 1, 0);
-	if (bytes_read <= 0)
+	if (bytes_read < 0)
 	{
 		return -1;
 	}

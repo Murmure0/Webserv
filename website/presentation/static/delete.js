@@ -1,8 +1,12 @@
 
 
 const delete_file = (path) => {
-	fetch(path, {
-		method: 'DELETE'
-	});
-	window.location.reload();
+	if (window.confirm("Are you sure you want to delete this file?")) {
+		fetch(path, {
+			method: 'DELETE'
+		});
+		setTimeout(() => {
+			window.location.reload();
+		}, 200);
+	}
 }
