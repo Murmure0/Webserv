@@ -41,8 +41,6 @@ void request::config_content_size(std::string header)
 
 void request::set_request_config()
 {
-	//std::cout << std::endl;
-	//std::cout << "In request config : " << std::endl;
 	/* Setting the METHODE*/
 	size_t methode_pos = _header.find("/");
 	std::string meth;
@@ -118,7 +116,7 @@ int request::read_and_append(int fd)
 	bytes_read = recv(fd, buffer, BUFFER_SIZE - 1, 0);
 	if (bytes_read == 0)
 	{
-		return 0;
+		return -1;
 	}
 	if (bytes_read < 0)
 	{

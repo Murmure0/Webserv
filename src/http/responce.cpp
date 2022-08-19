@@ -165,7 +165,7 @@ std::string responce::generate_get_responce(std::string path, std::string http_v
 	ss << infile.rdbuf();
 
 	// adding the minimal http header-ever to the file content:
-	str_resp = http_version + " " + status + "\nContent-Length: " + ft_to_string(ss.str().size()) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + ss.str() + "\r\n";
+	str_resp = http_version + " " + status + "\nContent-Length: " + ft_to_string(ss.str().length() + 2) + "\nContent-Type: " + _current_mime + "\r\n\r\n" + ss.str() + "\r\n";
 
 	infile.close();
 	return str_resp;
@@ -182,13 +182,17 @@ void responce::set_responce(std::string responce)
 
 std::string responce::cuted_responce(void)
 {
-	std::string cuted = _responce.substr(0, SEND_BUFFER_SIZE - 1);
+	std::string cuted ;
 
-	if (_responce.size() < SEND_BUFFER_SIZE)
+	if (_responce.size() < SEND_BUFFER_SIZE) {
+		cuted = _responce;
 		_responce = "";
-	else
-		_responce = _responce.substr(SEND_BUFFER_SIZE - 1);
-	if (_responce.size() == 0)
+	}
+	else {
+		cuted = _responce.substr(0, SEND_BUFFER_SIZE);
+		_responce = _responce.substr(SEND_BUFFER_SIZE);
+	}
+	if (_responce.empty()) 
 		_sent = true;
 	return cuted;
 }

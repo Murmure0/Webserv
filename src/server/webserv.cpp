@@ -615,7 +615,7 @@ std::string urlDecode(std::string str)
 	return ret;
 }
 
-t_responce_config webserv::generate_config(std::string host, std::string path, std::string header)
+t_responce_config webserv::generate_config(std::string host, std::string path)
 {
 	server *selected = NULL;
 	// if hostname match with server use this server. If not use default server with this port
@@ -650,24 +650,11 @@ t_responce_config webserv::generate_config(std::string host, std::string path, s
 		config.path += rtrim(path, "/");
 		config.error_pages = set_errors(&(selected->get_error_pages()), NULL);
 	}
-	// std::cout << config.path << " " << config.root << " " << config.index << std::endl;
 	//  add index if exist
 	if (compare_url(config.path, config.root) && config.index.size())
 	{
 		config.path = complete_url(config.path, config.index);
 	}
-	if (loc)
-	{
-		// std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | loc: " << loc->get_location_match() << " | " << config.path << " | " << config.method << std::endl;
-	}
-	else
-	{
-		// std::cout << "url: " << config.url << " | " << selected->get_id() + ":" + selected->get_server_name() << " | alone | " << config.path << std::endl;
-	}
-	config.header = header;
-	// std::cout << config.error_pages["404"] << std::endl;
-	//std::cout << config.index << std::endl;
-
 
 	if (save_path.find("?") != std::string::npos)
 		config.path = config.path + save_path.substr(save_path.find("?"));

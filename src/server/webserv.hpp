@@ -41,7 +41,7 @@ public:
 	/*
 	this function will generate the config structure used by the responce class
 	*/
-	t_responce_config generate_config(std::string host, std::string path, std::string header);
+	t_responce_config generate_config(std::string host, std::string path);
 	std::map<std::string, std::string> *get_mime(void);
 
 private:

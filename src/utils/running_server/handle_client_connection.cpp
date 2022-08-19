@@ -152,6 +152,7 @@ int webserv::handle_client_connection(void)
 					close((*i).first);
 					break;
 				}
+				break;
 			}
 		}
 
@@ -170,12 +171,13 @@ int webserv::handle_client_connection(void)
 				}
 				if ((*i).second.is_completed())
 				{
-					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(), (*i).second.get_addr_ip(), (*i).second.get_content_size(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path(), (*i).second.get_header()));
+					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(), (*i).second.get_addr_ip(), (*i).second.get_content_size(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path()));
 					open_responces[(*i).first].set_error(open_requests[(*i).first].get_error());
 					open_requests.erase(i);
 					FD_CLR((*i).first, &current_sockets);
 					break;
 				}
+				break;
 			}
 		}
 
@@ -186,13 +188,16 @@ int webserv::handle_client_connection(void)
 			if (FD_ISSET((*i).get_fd(), &ready_read_sockets))
 			{
 				int client_socket = accept_new_connection((*i).get_fd(), (*i).get_addr());
+				std::cout << client_socket << std::endl;
 				if (client_socket > 2) {
 					if (client_socket > max_fd)
 						max_fd = client_socket;
 					open_requests[client_socket] = request(this->_addr_ip);
 					FD_SET(client_socket, &current_sockets);
 				}
+				break;
 			}
 		}
+		usleep(400);
 	}
 }

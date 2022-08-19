@@ -40,7 +40,7 @@ int main(int argc, char **argv)
 	}
 	catch (listen_socket::ServerInitFailed &e)
 	{
-		std::cout << e.what() << std ::endl;
+		std::cerr << e.what() << std ::endl;
 		ws.close_sockets();
 		exit(1);
 	}
