@@ -560,7 +560,6 @@ void webserv::check_config(std::string config_file)
 				else
 					break;
 			}
-			std::cout << serv_name << std::endl;
 		}
 		if (s.length() > m_c.next_start)
 			s = s.substr(m_c.next_start);
@@ -571,12 +570,11 @@ void webserv::check_config(std::string config_file)
 
 void webserv::run()
 {
-	std::cout << "~*~ Server running ~*~" << std::endl;
 	std::cout << "Listening on ports (server name) : " << std::endl;
 
 	for (std::map<std::string, server>::const_iterator i = servers.begin(); i != servers.end(); i++)
 	{
-		std::cout << (*i).first << " (" << (*i).second.get_server_name() << ")" << std::endl;
+		std::cout << "\t" << KMAG << (*i).first << RST << " (" << (*i).second.get_server_name() << ")" << std::endl;
 	}
 	handle_client_connection();
 }
