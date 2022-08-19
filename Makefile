@@ -7,7 +7,7 @@ CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
 RM = rm -rf
 
-SOURCES = 	./src/parsing_main.cpp \
+SOURCES = 	./src/webserv.cpp \
 			./src/server/location.cpp \
 			./src/server/server.cpp \
 			./src/server/webserv.cpp \
