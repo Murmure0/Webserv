@@ -33,6 +33,8 @@ int webserv::handle_client_connection(void)
 	fd_set ready_read_sockets;
 	fd_set ready_write_sockets;
 
+	int max_fd = _listen_sockets.back().get_fd();
+
 	int ret;
 
 	std::map<int, request> open_requests;
@@ -67,7 +69,7 @@ int webserv::handle_client_connection(void)
 		  readfds and writefds to see if some of their descriptors are ready for readin or are ready for writing
 		  On return, select() replaces the given descriptor sets with subsets consisting of those descriptors that are ready for the requested operation.
 		  select() returns the total number of ready descriptors in all the sets. */
-		ret = select(FD_SETSIZE, &ready_read_sockets, &ready_write_sockets, NULL, &tv);
+		ret = select(max_fd + 1, &ready_read_sockets, &ready_write_sockets, NULL, &tv);
 
 		if (ret < 0 || ret == 0) // error or timeout
 		{
@@ -163,6 +165,7 @@ int webserv::handle_client_connection(void)
 					open_responces.erase((*i).first);
 					FD_CLR((*i).first, &current_sockets);
 					close((*i).first);
+					break;
 				}
 				if ((*i).second.is_completed())
 				{
@@ -182,11 +185,11 @@ int webserv::handle_client_connection(void)
 			if (FD_ISSET((*i).get_fd(), &ready_read_sockets))
 			{
 				int client_socket = accept_new_connection((*i).get_fd(), (*i).get_addr());
+				if (client_socket > max_fd)
+					max_fd = client_socket;
 				open_requests[client_socket] = request(this->_addr_ip);
 				FD_SET(client_socket, &current_sockets);
 			}
 		}
 	}
-	// CTRL +C :
-	exit(EXIT_SUCCESS);
 }
