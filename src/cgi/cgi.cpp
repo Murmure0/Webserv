@@ -51,13 +51,14 @@ std::vector<std::string>	responce::cgi_env()
 
 	///PATH_INFO:Extra path information passed to a CGI program.
 	///TO DO voir si pas un probleme avec le testeur de l'école mais pour le moment ça suit la RFC
-	if (_header.at("Method:") == "GET")
+	if (_header.at("Method:") == "GET" && _config.path.find("?") != std::string::npos)
 		env.push_back("PATH_INFO=" + _config.path.substr(_config.path.find("?") + 1));
 	else
 		env.push_back("PATH_INFO=");
 
 	getcwd(tmp_path, PATH_MAX);
-	env.push_back(std::string ("PATH_TRANSLATE=") + tmp_path + "/" + _config.path.substr(2));
+	if (_config.path.length() >= 2)
+		env.push_back(std::string ("PATH_TRANSLATE=") + tmp_path + "/" + _config.path.substr(2));
 
 	if (_header.at("Method:") == "GET")
 		env.push_back("SCRIPT_NAME=" + _config.path.substr(0, _config.path.find("?")));
