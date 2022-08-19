@@ -14,6 +14,7 @@ int webserv::accept_new_connection(int server_fd, sockaddr_in sockaddr)
 		return -1;
 	}
 	(void)(sockaddr);
+	fcntl(connection, F_SETFL, O_NONBLOCK);
 	inet_ntop(AF_INET, &(addr.sin_addr.s_addr), buff, INET_ADDRSTRLEN);
 	if (!buff[0])
 	{
@@ -128,7 +129,7 @@ int webserv::handle_client_connection(void)
 			}
 			open_requests.erase(open_requests.begin(), open_requests.end());
 		}
-		
+
 		// loop on open_responces to send a small part of the response to each client simultaneously
 		for (std::map<int, responce>::iterator i = open_responces.begin(); i != open_responces.end(); i++)
 		{
@@ -149,7 +150,7 @@ int webserv::handle_client_connection(void)
 				if ((*i).second.is_sent() || ret == -1)
 				{
 					open_responces.erase(i);
-					close((*i).first);
+					// close((*i).first);
 					break;
 				}
 				break;
@@ -162,7 +163,8 @@ int webserv::handle_client_connection(void)
 			if (FD_ISSET((*i).first, &ready_read_sockets))
 			{
 				int ret = (*i).second.read_and_append((*i).first);
-				if (ret == -1) {
+				if (ret == -1)
+				{
 					open_requests.erase(i);
 					open_responces.erase((*i).first);
 					FD_CLR((*i).first, &current_sockets);
@@ -173,8 +175,7 @@ int webserv::handle_client_connection(void)
 				{
 					open_responces[(*i).first] = responce((*i).second.get_header(), (*i).second.get_body(), (*i).second.get_addr_ip(), (*i).second.get_content_size(), get_mime(), generate_config((*i).second.get_port_location(), (*i).second.get_path()));
 					open_responces[(*i).first].set_error(open_requests[(*i).first].get_error());
-					open_requests.erase(i);
-					FD_CLR((*i).first, &current_sockets);
+					open_requests[(*i).first].clear();
 					break;
 				}
 				break;
@@ -188,8 +189,8 @@ int webserv::handle_client_connection(void)
 			if (FD_ISSET((*i).get_fd(), &ready_read_sockets))
 			{
 				int client_socket = accept_new_connection((*i).get_fd(), (*i).get_addr());
-				std::cout << client_socket << std::endl;
-				if (client_socket > 2) {
+				if (client_socket > 2)
+				{
 					if (client_socket > max_fd)
 						max_fd = client_socket;
 					open_requests[client_socket] = request(this->_addr_ip);
@@ -198,6 +199,5 @@ int webserv::handle_client_connection(void)
 				break;
 			}
 		}
-		usleep(400);
 	}
 }

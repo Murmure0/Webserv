@@ -44,7 +44,7 @@ void request::set_request_config()
 	/* Setting the METHODE*/
 	size_t methode_pos = _header.find("/");
 	std::string meth;
-	if(methode_pos == std::string::npos)
+	if (methode_pos == std::string::npos)
 		meth = _header.substr(0);
 	else
 		meth = _header.substr(0, methode_pos - 1);
@@ -63,7 +63,7 @@ void request::set_request_config()
 
 	/* Setting CONTENT_SIZE*/
 	_request_config.set_content_length(this->get_content_size());
- 
+
 	/* Setting HTTP/Version*/
 	size_t http_pos = _header.find("HTTP/");
 	std::string pre_http = _header.substr(http_pos);
@@ -76,23 +76,23 @@ void request::set_request_config()
 		v_http = pre_http.substr(0, end_http);
 	_request_config.set_v_http(v_http);
 
-	//std::cout << std::endl;
+	// std::cout << std::endl;
 }
 
 std::string request::check_request_config(void) const
 {
-	if (_request_config.get_content_length() < 0 && _body.size() != _content_size)
-		return ("400 Bad Request"); //Content-Length header field having an invalid value
+	if (_request_config.get_content_length() - 1 == 0 && _body.size() != _content_size)
+		return ("400 Bad Request"); // Content-Length header field having an invalid value
 	else if (_request_config.get_methode() == "POST" && (_request_config.get_content_length() == 0 && _header.find("Content-Length: 0") == std::string::npos))
 		return ("411 Length Required"); // rrequest is POST and don't have amy content length
 	else if (_request_config.get_url() == "")
-		return ("400 Bad Request"); //pas d'url fournie
+		return ("400 Bad Request"); // pas d'url fournie
 	else if (_request_config.get_url().length() > 8096)
-		return ("414 URI Too Long"); //URI Too Long
+		return ("414 URI Too Long"); // URI Too Long
 	else if (_request_config.get_methode() != "POST" && _request_config.get_methode() != "GET" && _request_config.get_methode() != "DELETE")
-		return ("501 Not Implemented"); //methode not implemented
+		return ("501 Not Implemented"); // methode not implemented
 	else if (_request_config.get_v_http() != "HTTP/1.1")
-		return("505 HTTP Version Not Supported"); //http version not supported
+		return ("505 HTTP Version Not Supported"); // http version not supported
 	else
 		return "";
 }
@@ -109,7 +109,7 @@ void request::clear(void)
 int request::read_and_append(int fd)
 {
 	char buffer[BUFFER_SIZE];
-	size_t bytes_read;
+	int bytes_read;
 
 	if (_request_completed)
 		return 0;
@@ -134,10 +134,10 @@ int request::read_and_append(int fd)
 			_body = _header.substr(_header.find("\r\n\r\n") + 4);
 			_header = _header.substr(0, _header.find("\r\n\r\n"));
 			config_content_size(_header);
-			//std::cout << "XXX|"<< _header << "|XXX"<< std::endl;
-			// fill request_config
+			// std::cout << "XXX|"<< _header << "|XXX"<< std::endl;
+			//  fill request_config
 			set_request_config();
-			//std::cout << _request_config.get_url().length() << "|" << std::endl;
+			// std::cout << _request_config.get_url().length() << "|" << std::endl;
 		}
 	}
 	else
@@ -148,10 +148,9 @@ int request::read_and_append(int fd)
 	{
 		_request_completed = true;
 
-
 		_error = this->check_request_config();
-		//std::cout << _error << std::endl;
-		// std::cout << _header << std::endl;
+		// std::cout << _error << std::endl;
+		//  std::cout << _header << std::endl;
 	}
 	return 0;
 }

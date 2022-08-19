@@ -35,7 +35,11 @@ const random_ball = () => {
 const touch_player = (player, player_y, computer_y, ball_angle) => {
 	const x = player == "player" ? 0 : 670;
 	const c_pos = player == "player" ? player_y : computer_y;
-	const abstract = ((ball_angle + Math.PI) > Math.PI / 2) && (ball_angle + Math.PI < Math.PI / 2 * 3);
+	let ang = ball_angle + Math.PI;
+	if (ang < 0)
+		ang += 2 * Math.PI;
+	const abstract = (ang > Math.PI / 2) && (ang < Math.PI / 2 * 3);
+
 	if (abstract && player == "player") {
 		return false;
 	}
@@ -44,7 +48,17 @@ const touch_player = (player, player_y, computer_y, ball_angle) => {
 		return false;
 	}
 
-	return (ball_x >= x && ball_x <= x + 30) && (ball_y >= c_pos - 5 && ball_y <= c_pos + 65);
+	return (ball_x >= x && ball_x <= x + 30) && (ball_y >= c_pos - 5 && ball_y <= c_pos + 70);
+}
+
+const get_ball_angle = (ball_y, player_y, is_computer) => {
+	const player_center = player_y + 30;
+	let diff = ball_y - player_center;
+	if (diff > 30)
+		diff = 30;
+	if (diff < -30)
+		diff = -30;
+	return 1.109 / 30 * diff * (is_computer ? -1 : 1) + (is_computer ? Math.PI : 0);
 }
 
 const move_ball = () => {
@@ -72,12 +86,9 @@ const move_ball = () => {
 }
 
 const computer_move = (computer_y, ball_y) => {
-	let move = Math.abs(computer_y + 30 - ball_x);
-	if (move > 10) {
-		move = 10;
-	}
+	let move = players_move;
 
-	if (ball_y > computer_y && ball_y < computer_y + 60)
+	if (ball_y > computer_y + 10 && ball_y < computer_y + 50)
 		move = 0;
 	let y = ball_y > computer_y + 30 ? computer_y + move : computer_y - move;
 
@@ -126,11 +137,10 @@ const loop = () => {
 	computer_y = computer_move(computer_y, ball_y);
 	move_ball();
 	if (touch_player("player", player_y, computer_y, ball_angle)) {
-		ball_angle = Math.PI - ball_angle;
-		console.log("ret")
+		ball_angle = get_ball_angle(ball_y, player_y, false);
 	}
 	if (touch_player("computer", player_y, computer_y, ball_angle)) {
-		ball_angle = Math.PI - ball_angle;
+		ball_angle = get_ball_angle(ball_y, computer_y, true);
 	}
 	draw_game(context, player_y, computer_y, ball_x, ball_y);
 }
